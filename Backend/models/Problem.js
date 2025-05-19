@@ -6,7 +6,7 @@ const testCaseSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.Mixed, // Can store any type: string, number, array, object
       required: true,
     },
-    expectedOutput: {
+    output: {
       type: mongoose.Schema.Types.Mixed,
       required: true,
     },
@@ -24,12 +24,20 @@ const problemSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  authorName: {
+    type: String,
+    required: true,
+  },
   difficulty: {
     type: String,
     required: true,
   },
   tags: {
     type: [String],
+    required: true,
+  },
+  constraints: {
+    type: String,
     required: true,
   },
   testCases: {

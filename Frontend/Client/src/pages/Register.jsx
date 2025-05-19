@@ -7,6 +7,7 @@ const Register = () => {
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
+    userName: "",
     email: "",
     collegeName: "",
     password: "",
@@ -21,6 +22,7 @@ const Register = () => {
     const {
       firstName,
       lastName,
+      userName,
       email,
       collegeName,
       password,
@@ -30,6 +32,7 @@ const Register = () => {
       firstName == "" ||
       lastName == "" ||
       email == "" ||
+      userName == "" ||
       collegeName == "" ||
       password == "" ||
       confirmPassword == ""
@@ -47,6 +50,7 @@ const Register = () => {
         localStorage.setItem("token", res.data.token);
         window.location.href = "/login";
       }
+      setError("");
     } catch (error) {
       if (error.response) {
         const status = error.response.status;
@@ -57,6 +61,8 @@ const Register = () => {
           setError("Password do not match");
         } else if (status == 409) {
           setError("Email already exists");
+        } else if (status == 410) {
+          setError("UserName already exists");
         }
       } else {
         setError("Network error. Please check your connection.");
@@ -101,6 +107,23 @@ const Register = () => {
               name="lastName"
               id="lastName"
               placeholder="Kumar"
+              onChange={handleChange}
+              className="px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+            />
+          </div>
+          {/*UserName */}
+          <div className="flex flex-col">
+            <label
+              htmlFor="userName"
+              className="mb-1 text-gray-700 dark:text-gray-200"
+            >
+              User Name
+            </label>
+            <input
+              type="userName"
+              id="userName"
+              name="userName"
+              placeholder="SpidyCoder"
               onChange={handleChange}
               className="px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
             />
