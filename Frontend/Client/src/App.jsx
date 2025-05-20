@@ -5,8 +5,8 @@ import Problems from "./pages/problems";
 import Contribute from "./pages/contribute";
 import Admin from "./pages/admin";
 import Login from "./pages/Login";
+import Home from "./pages/Home";
 import Register from "./pages/Register";
-const Home = () => <div className="p-4 text-xl">Home Page</div>;
 
 function App() {
   return (

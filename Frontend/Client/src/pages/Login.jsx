@@ -26,7 +26,12 @@ const Login = () => {
     try {
       const res = await axios.post("http://localhost:8000/login", formData);
       if (res.status === 200) {
-        localStorage.setItem("token", res.data.token);
+        const userData = {
+          token: res.data.token,
+          userName: res.data.userName,
+        };
+        localStorage.setItem("user", JSON.stringify(userData));
+        console.log("User's Infro from Frontend from login's page",userData);
         window.location.href = "/";
       }
     } catch (error) {

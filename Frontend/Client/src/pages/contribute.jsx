@@ -71,7 +71,7 @@ const Contribute = () => {
       console.log("Problem sent to backend", res.data);
       if (res.status == 200) {
         localStorage.setItem("token", res.data.token);
-        window.location.href = "/";
+        window.location.href = "/problems";
       }
       setError("");
     } catch (error) {

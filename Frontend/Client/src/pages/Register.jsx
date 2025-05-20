@@ -47,8 +47,16 @@ const Register = () => {
     try {
       const res = await axios.post("http://localhost:8000/register", formData);
       if (res.status === 200) {
-        localStorage.setItem("token", res.data.token);
+        const userData = {
+          token: res.data.token,
+          userName: res.data.userName,
+        };
+        localStorage.setItem("user", JSON.stringify(userData));
         window.location.href = "/login";
+        console.log(
+          "User's Infro from Frontend from register's page",
+          userData
+        );
       }
       setError("");
     } catch (error) {

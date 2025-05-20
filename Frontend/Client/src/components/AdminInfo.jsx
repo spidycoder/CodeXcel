@@ -1,5 +1,3 @@
-import { Link } from "react-router-dom"; // or use <a> if you're linking to external pages
-
 const AdminInfo = () => {
   return (
     <div className="bg-white p-6 rounded-lg shadow-md text-center mb-8">
@@ -21,7 +19,6 @@ const AdminInfo = () => {
       <p className="text-sm text-gray-600">
         Email: <span className="font-medium">aditya767718@gmail.com</span>
       </p>
-
       <div className="mt-4 flex justify-center gap-4 text-blue-600 underline">
         <a
           href="https://www.linkedin.com/in/aditya-kumar-ba6784228/"

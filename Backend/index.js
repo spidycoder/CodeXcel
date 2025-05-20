@@ -30,6 +30,7 @@ app.post("/register", async (req, res) => {
       password,
       confirmPassword,
     } = req.body;
+
     if (
       !firstName ||
       !lastName ||
@@ -45,21 +46,26 @@ app.post("/register", async (req, res) => {
           "Please fill all the required fields and password should be at least 8 characters long.",
       });
     }
+
     if (confirmPassword !== password) {
       return res.status(401).json({
         message: "Passwords do not match.",
       });
     }
+
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      res.status(409).send("Email already exists");
+      return res.status(409).send("Email already exists");
     }
+
     const existingUserName = await User.findOne({ userName });
     if (existingUserName) {
-      res.status(410).send("UserName already exists");
+      return res.status(410).send("UserName already exists");
     }
+
     const salt = bcrypt.genSaltSync(10);
     const hashedPassword = bcrypt.hashSync(password, salt);
+
     const user = await User.create({
       firstName,
       lastName,
@@ -68,37 +74,62 @@ app.post("/register", async (req, res) => {
       collegeName,
       password: hashedPassword,
     });
+
     const token = jwt.sign({ id: user._id, email }, process.env.SECRET_KEY, {
       expiresIn: "1h",
     });
-    user.token = token;
-    user.password = hashedPassword;
-    res.status(200).send("User registered Successfully");
-    console.log(user);
+
+    res.status(200).json({
+      token,
+      userName: user.userName,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      collegeName: user.collegeName,
+    });
+    console.log("User registered successfully", res.data);
   } catch (error) {
     console.error("Error while creating User", error);
+    res.status(500).send("Internal Server Error");
   }
 });
+
 //login route
 app.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
+
     if (!email || !password) {
-      res.status(400).send("All fields are Required.");
+      return res.status(400).send("All fields are Required.");
     }
-    // console.log("Email from backend: ", email);
-    // console.log("Password from backend: ", password);
+
     const existingUser = await User.findOne({ email });
-    console.log(existingUser);
     if (!existingUser) {
-      res.status(400).send("Invalid Email");
+      return res.status(400).send("Invalid Email");
     }
-    if (!bcrypt.compareSync(password, existingUser.password)) {
-      res.status(401).send("wrong password.");
+
+    const isMatch = bcrypt.compareSync(password, existingUser.password);
+    if (!isMatch) {
+      return res.status(401).send("Wrong password.");
     }
-    res.status(200).send("User found successfully using Backend");
+
+    const token = jwt.sign(
+      { id: existingUser._id, email: existingUser.email },
+      process.env.SECRET_KEY,
+      { expiresIn: "1h" }
+    );
+
+    res.status(200).json({
+      token,
+      userName: existingUser.userName,
+      email: existingUser.email,
+      firstName: existingUser.firstName,
+      lastName: existingUser.lastName,
+      collegeName: existingUser.collegeName,
+    });
   } catch (error) {
     console.error("Error while logging in User", error);
+    res.status(500).send("Internal Server Error");
   }
 });
 //contribte route
@@ -144,25 +175,126 @@ app.post("/contribute", async (req, res) => {
       constraints,
       testCases,
     });
-    console.log(problem);
+    // console.log(problem);
     res.status(200).send("Problem Contributed Successfully");
   } catch (error) {
     console.error("Error while creating problem", error);
   }
 });
-//route to find the problem by name
-app.get("/problems", async (req, res) => {
+//route to find the problem by name for the problems page.
+app.get("/problems/:problemName", async (req, res) => {
   try {
-    const problemName = req.body;
+    const { problemName } = req.params;
     const existingProblem = await Problem.findOne({ problemName });
     if (!existingProblem) {
-      res.status(401).send("problem doest not exist.write the corrent name.");
+      return res
+        .status(404)
+        .send("Problem does not Exists,Write the correct name.");
     }
+    console.log(existingProblem);
     res.status(200).send(existingProblem);
   } catch (error) {
-    console.error("Error while finding the Problem", error);
+    console.error("Error While Finding the Problem", error);
+    res.status(500).send("Server Error");
   }
 });
+//route to find the problem by name for the admin's page.
+app.post("/admin", async (req, res) => {
+  try {
+    const { problemName, userInfo } = req.body;
+    const existingProblem = await Problem.findOne({ problemName });
+    if (!existingProblem) {
+      return res
+        .status(404)
+        .send("Problem does not Exists,Write the correct name.");
+    }
+    // console.log(existingProblem);
+    res.status(200).send(existingProblem);
+  } catch (error) {
+    console.error("Error While Finding the Problem", error);
+    res.status(500).send("Server Error");
+  }
+});
+//route to update the problem from admin's page
+app.put("/admin", async (req, res) => {
+  try {
+    const { problemInfo, userInfo, problemNameOfForm } = req.body;
+    const { userName } = userInfo;
+
+    const { formData, tags, testCases } = problemInfo;
+    const { problemName, description, authorName, difficulty, constraints } =
+      formData;
+
+    const problemNameFromFrontend = problemName;
+    const descriptionFromFrontend = description;
+    const authorNameFromFrontend = authorName;
+    const difficultyFromFrontend = difficulty;
+    const tagsFromFrontend = tags;
+    const constraintsFromFrontend = constraints;
+    const testCasesFromFrontend = testCases;
+    const existingProblem = await Problem.findOne({
+      problemName: problemNameOfForm,
+    });
+    if (!existingProblem) {
+      return res.status(404).send("Problem not found");
+    }
+    // console.log("Existing Problem from Backend", existingProblem);
+
+    // Authorization check: only author or admin can update
+    if (existingProblem.authorName !== userName && userName !== "Spidycoder") {
+      return res.status(401).send("Unauthorized to update this problem.");
+    }
+
+    // Use findOneAndUpdate to update and return the updated document
+    const updatedProblem = await Problem.findOneAndUpdate(
+      { problemName: problemNameOfForm }, // filter
+      {
+        $set: {
+          problemName: problemNameFromFrontend,
+          description: descriptionFromFrontend,
+          authorName: authorNameFromFrontend,
+          difficulty: difficultyFromFrontend,
+          tags: tagsFromFrontend,
+          constraints: constraintsFromFrontend,
+          testCases: testCasesFromFrontend,
+        },
+      },
+      { new: true } // this ensures the returned document is the updated one
+    );
+    // console.log("Updated Problem from backend", updatedProblem);
+    res.status(200).json("Problem Updated Successfully");
+  } catch (error) {
+    console.error("Error While Updating the Problem", error);
+    res.status(500).send("Server Error");
+  }
+});
+
+app.delete("/delete", async (req, res) => {
+  try {
+    const { userInfo, problemNameOfForm } = req.body;
+    const { userName } = userInfo;
+
+    const existingProblem = await Problem.findOne({
+      problemName: problemNameOfForm,
+    });
+
+    if (!existingProblem) {
+      return res.status(404).send("Problem not found");
+    }
+
+    if (existingProblem.authorName !== userName && userName !== "Spidycoder") {
+      return res.status(401).send("Unauthorized to delete this problem.");
+    }
+
+    await Problem.deleteOne({ problemName: problemNameOfForm });
+
+    res.status(200).send("Problem deleted successfully");
+  } catch (error) {
+    console.error("Error while deleting the problem", error);
+    res.status(500).send("Server Error");
+  }
+});
+
 app.listen(PORT, () => {
   console.log("Server is running on port 8000");
 });

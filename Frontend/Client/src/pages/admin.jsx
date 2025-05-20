@@ -3,11 +3,11 @@ import axios from "axios";
 import AdminInfo from "../components/AdminInfo";
 
 const Admin = () => {
-  const [problemName, setProblemName] = useState("");
+  const [error, setError] = useState("");
+  const [problemNameOfForm, setProblemNameOfForm] = useState("");
   const [problemData, setProblemData] = useState(null);
   const [tags, setTags] = useState([""]);
   const [testCases, setTestCases] = useState([{ input: "", output: "" }]);
-
   const [formData, setFormData] = useState({
     problemName: "",
     description: "",
@@ -16,8 +16,8 @@ const Admin = () => {
     constraints: "",
   });
 
-  const handleChange = (e) => {
-    setProblemName(e.target.value);
+  const handleSearchBarChange = (e) => {
+    setProblemNameOfForm(e.target.value);
   };
 
   const handleFormChange = (e) => {
@@ -51,13 +51,23 @@ const Admin = () => {
   const removeTestcaseBox = (index) => {
     setTestCases(testCases.filter((_, i) => i !== index));
   };
-
-  const handleSubmit = async (e) => {
+  const storedUser = localStorage.getItem("user");
+  const user = storedUser ? JSON.parse(storedUser) : null;
+  if (user) {
+    console.log("UserInfo from frontend from admin's page", user);
+  }
+  const handleFindProblem = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.get(
-        `http://localhost:8000/problems/${problemName}`
-      );
+      if (problemNameOfForm === "") {
+        setError("fill the problem name correctly");
+        return;
+      }
+      //here,we need to send the problemName as {problemName:problemNameOfForm}.
+      const res = await axios.post("http://localhost:8000/admin", {
+        problemName: problemNameOfForm,
+        userInfo: user,
+      });
       const data = res.data;
       setProblemData(data);
       setFormData({
@@ -69,27 +79,92 @@ const Admin = () => {
       });
       setTags(data.tags || [""]);
       setTestCases(data.testCases || [{ input: "", output: "" }]);
+      setError("");
     } catch (error) {
-      console.error("Error fetching problem:", error);
+      if (error.response) {
+        const status = error.response.status;
+        const message = error.response.data;
+        if (status == 404) {
+          setError(message);
+        }
+      } else {
+        console.error("Error fetching problem:", error);
+      }
+    }
+  };
+  const handleUpdateProblem = async (e) => {
+    e.preventDefault();
+    try {
+      const payload = {
+        formData,
+        tags,
+        testCases,
+      };
+      const res = await axios.put("http://localhost:8000/admin", {
+        problemInfo: payload,
+        userInfo: user,
+        problemNameOfForm: problemNameOfForm,
+      });
+      const data = res.data;
+      console.log("data received from backend", data);
+      setError("");
+    } catch (error) {
+      if (error.response) {
+        const status = error.response.status;
+        const message = error.response.data;
+        if (status == 404) {
+          setError(message);
+        } else if (status == 401) {
+          setError(message);
+        }
+      } else {
+        console.error("Error Updating problem:", error);
+      }
+    }
+  };
+  const handleDeleteProblem = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await axios.delete("http://localhost:8000/delete", {
+        data: {
+          userInfo: user,
+          problemNameOfForm: problemNameOfForm,
+        },
+      });
+      const data = res.data;
+      console.log("data received from backend", data);
+      setError("");
+    } catch (error) {
+      if (error.response) {
+        const status = error.response.status;
+        const message = error.response.data;
+        if (status == 404) {
+          setError(message);
+        } else if (status == 401) {
+          setError(message);
+        }
+      } else {
+        console.error("Error Updating problem:", error);
+      }
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
-      <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-6">
-        <AdminInfo/>
-
+    <div className="min-h-screen bg-gray-100 p-4 md:p-6">
+      <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-md p-4 md:p-8">
+        <AdminInfo />
         {/* Search Bar */}
         <div className="mb-6">
+          <h2 className="text-xl font-semibold mb-2">Search Problem</h2>
           <input
             type="text"
-            name="problemName"
-            onChange={handleChange}
             placeholder="Search problem by name"
+            value={problemNameOfForm}
+            onChange={handleSearchBarChange}
             className="w-full border px-4 py-2 rounded mb-2"
           />
           <button
-            onClick={handleSubmit}
+            onClick={handleFindProblem}
             className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
           >
             Find Problem
@@ -100,7 +175,7 @@ const Admin = () => {
         {problemData && (
           <form className="space-y-6">
             <div>
-              <label>Problem Name</label>
+              <label className="font-semibold">Problem Name</label>
               <input
                 type="text"
                 name="problemName"
@@ -109,18 +184,20 @@ const Admin = () => {
                 className="w-full border px-4 py-2 rounded"
               />
             </div>
+
             <div>
-              <label>Description</label>
+              <label className="font-semibold">Description</label>
               <textarea
                 name="description"
-                rows={4}
                 value={formData.description}
                 onChange={handleFormChange}
+                rows={4}
                 className="w-full border px-4 py-2 rounded"
               />
             </div>
+
             <div>
-              <label>Author Name</label>
+              <label className="font-semibold">Author Name</label>
               <input
                 type="text"
                 name="authorName"
@@ -129,8 +206,9 @@ const Admin = () => {
                 className="w-full border px-4 py-2 rounded"
               />
             </div>
+
             <div>
-              <label>Difficulty</label>
+              <label className="font-semibold">Difficulty</label>
               <select
                 name="difficulty"
                 value={formData.difficulty}
@@ -146,13 +224,13 @@ const Admin = () => {
 
             {/* Tags */}
             <div>
-              <label>Tags</label>
+              <label className="font-semibold">Tags</label>
               {tags.map((tag, index) => (
                 <div key={index} className="flex gap-2 mb-2">
                   <input
                     value={tag}
                     onChange={(e) => handleTagChange(index, e.target.value)}
-                    className="flex-grow border px-4 py-2 rounded"
+                    className="flex-1 border px-4 py-2 rounded"
                   />
                   {tags.length > 1 && (
                     <button
@@ -168,7 +246,7 @@ const Admin = () => {
               <button
                 type="button"
                 onClick={addTagBox}
-                className="bg-green-500 text-white px-4 py-1 rounded"
+                className="bg-green-500 text-white px-4 py-2 rounded"
               >
                 + Add Tag
               </button>
@@ -176,7 +254,7 @@ const Admin = () => {
 
             {/* Constraints */}
             <div>
-              <label>Constraints</label>
+              <label className="font-semibold">Constraints</label>
               <input
                 type="text"
                 name="constraints"
@@ -188,9 +266,12 @@ const Admin = () => {
 
             {/* Test Cases */}
             <div>
-              <label>Test Cases</label>
+              <label className="font-semibold">Test Cases</label>
               {testCases.map((testCase, index) => (
-                <div key={index} className="flex gap-2 mb-2">
+                <div
+                  key={index}
+                  className="flex flex-col md:flex-row gap-2 mb-2"
+                >
                   <input
                     type="text"
                     placeholder="Input"
@@ -223,29 +304,32 @@ const Admin = () => {
               <button
                 type="button"
                 onClick={addTestcaseBox}
-                className="bg-green-500 text-white px-4 py-1 rounded"
+                className="bg-green-500 text-white px-4 py-2 rounded"
               >
                 + Add Test Case
               </button>
             </div>
 
-            {/* Submit Buttons */}
-            <div className="flex gap-4">
+            {/* Actions */}
+            <div className="flex flex-col md:flex-row gap-4">
               <button
                 type="submit"
                 className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
+                onClick={handleUpdateProblem}
               >
                 Update
               </button>
               <button
                 type="button"
                 className="bg-red-600 text-white px-6 py-2 rounded hover:bg-red-700"
+                onClick={handleDeleteProblem}
               >
                 Delete
               </button>
             </div>
           </form>
         )}
+        {error && <div className="text-red-500">{error}</div>}
       </div>
     </div>
   );
