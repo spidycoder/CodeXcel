@@ -304,6 +304,25 @@ app.get("/problems", async (req, res) => {
     return res.status(500).send("Interal Server Error");
   }
 });
+//route to find problem by name
+app.get("/problems/:problemName", async (req, res) => {
+  try {
+    //here params is used to fetch the details from url
+    const { problemName } = req.params;
+
+    const existingProblem = await Problem.findOne({ problemName });
+
+    if (!existingProblem) {
+      return res.status(404).send("No problem found");
+    }
+
+    res.status(200).send(existingProblem);
+  } catch (error) {
+    console.error("Error while fetching problem using problemName", error);
+    return res.status(500).send("Internal Server Error");
+  }
+});
+
 app.listen(PORT, () => {
   console.log("Server is running on port 8000");
 });

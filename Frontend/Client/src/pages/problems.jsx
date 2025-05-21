@@ -1,5 +1,6 @@
 import axios from "axios";
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 
 const Problems = () => {
   const [problems, setProblems] = useState([]);
@@ -19,20 +20,22 @@ const Problems = () => {
           {problems.map((problem) => (
             <li key={problem._id} className="border p-4 rounded shadow">
               <h2 className="text-xl font-semibold">
-                {problem.problemName}{" "}
-                {
-                  <span
-                    className={`${
-                      problem.difficulty === "Easy"
-                        ? "text-green-500"
-                        : problem.difficulty === "Medium"
-                        ? "text-yellow-500"
-                        : "text-red-500"
-                    }`}
-                  >
-                    ({problem.difficulty})
-                  </span>
-                }
+                <Link to={`/problems/${problem.problemName}`}>
+                  {problem.problemName}{" "}
+                  {
+                    <span
+                      className={`${
+                        problem.difficulty === "Easy"
+                          ? "text-green-500"
+                          : problem.difficulty === "Medium"
+                          ? "text-yellow-500"
+                          : "text-red-500"
+                      }`}
+                    >
+                      ({problem.difficulty})
+                    </span>
+                  }
+                </Link>
               </h2>
               <p>{problem.description}</p>
               <p className="text-sm text-gray-600">
