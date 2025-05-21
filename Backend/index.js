@@ -268,7 +268,7 @@ app.put("/admin", async (req, res) => {
     res.status(500).send("Server Error");
   }
 });
-
+//route to delete problems
 app.delete("/delete", async (req, res) => {
   try {
     const { userInfo, problemNameOfForm } = req.body;
@@ -294,7 +294,16 @@ app.delete("/delete", async (req, res) => {
     res.status(500).send("Server Error");
   }
 });
-
+//route to find the problems
+app.get("/problems", async (req, res) => {
+  try {
+    const problems = await Problem.find();
+    res.status(200).send(problems);
+  } catch (error) {
+    console.error("Error while fetching problem", error);
+    return res.status(500).send("Interal Server Error");
+  }
+});
 app.listen(PORT, () => {
   console.log("Server is running on port 8000");
 });
