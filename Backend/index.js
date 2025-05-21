@@ -199,9 +199,9 @@ app.get("/problems/:problemName", async (req, res) => {
   }
 });
 //route to find the problem by name for the admin's page.
-app.post("/admin", async (req, res) => {
+app.get("/admin", async (req, res) => {
   try {
-    const { problemName, userInfo } = req.body;
+    const { problemName, userInfo } = req.query;
     const existingProblem = await Problem.findOne({ problemName });
     if (!existingProblem) {
       return res

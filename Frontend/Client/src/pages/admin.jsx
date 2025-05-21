@@ -64,9 +64,11 @@ const Admin = () => {
         return;
       }
       //here,we need to send the problemName as {problemName:problemNameOfForm}.
-      const res = await axios.post("http://localhost:8000/admin", {
-        problemName: problemNameOfForm,
-        userInfo: user,
+      const res = await axios.get("http://localhost:8000/admin", {
+        params: {
+          problemName: problemNameOfForm,
+          userInfo: user,
+        },
       });
       const data = res.data;
       setProblemData(data);

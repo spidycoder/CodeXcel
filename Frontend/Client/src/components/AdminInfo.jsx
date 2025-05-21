@@ -8,7 +8,7 @@ const AdminInfo = () => {
       />
       <h2 className="text-2xl font-semibold text-gray-800">Aditya Kumar</h2>
       <p className="text-sm text-gray-600">
-        Username: <span className="font-medium">SpidyCoder</span>
+        Username: <span className="font-medium">Spidycoder</span>
       </p>
       <p className="text-sm text-gray-600">
         College:{" "}
