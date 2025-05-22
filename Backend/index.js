@@ -5,6 +5,8 @@ const Problem = require("./models/Problem");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const cors = require("cors");
+const { generateFile } = require("./generateFile");
+const { executeCPP } = require("./executeCPP");
 
 const app = express();
 app.use(cors());
@@ -191,7 +193,7 @@ app.get("/problems/:problemName", async (req, res) => {
         .status(404)
         .send("Problem does not Exists,Write the correct name.");
     }
-    console.log(existingProblem);
+    // console.log(existingProblem);
     res.status(200).send(existingProblem);
   } catch (error) {
     console.error("Error While Finding the Problem", error);
@@ -322,7 +324,37 @@ app.get("/problems/:problemName", async (req, res) => {
     return res.status(500).send("Internal Server Error");
   }
 });
+//api for running the code
+app.post("/run", async (req, res) => {
+  try {
+    const { input, problemName, language, code } = req.body;
+    // console.log("Input received in backend", input);
+    // console.log("problemName received in backend", problemName);
+    // console.log("language received in backend", language);
+    // console.log("code received in backend", code);
 
+    if (input.length == 0) {
+      res.status(400).send("Fill the input");
+    }
+    if (problemName === "") {
+      res.status(401).send("problem name is not defined");
+    }
+    if (language === undefined) res.status(402).send("Choose the language");
+    if (code === undefined) res.status(403).send("Write the complete code");
+    const existingProblem = await Problem.findOne({ problemName });
+    const testCases = existingProblem.testCases;
+    // console.log("TestCases of the Problem", testCases);
+    const filePath = generateFile(language, code);
+    const output = await executeCPP(filePath, input);
+    console.log("Output received for the Problem", output);
+    res.status(200).json({
+      output,
+    });
+  } catch (error) {
+    console.error("Error while running the code", error);
+    res.status(500).send("Internal Server Error");
+  }
+});
 app.listen(PORT, () => {
   console.log("Server is running on port 8000");
 });

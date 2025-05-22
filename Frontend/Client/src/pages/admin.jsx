@@ -4,6 +4,7 @@ import AdminInfo from "../components/AdminInfo";
 
 const Admin = () => {
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [problemNameOfForm, setProblemNameOfForm] = useState("");
   const [problemData, setProblemData] = useState(null);
   const [tags, setTags] = useState([""]);
@@ -107,8 +108,20 @@ const Admin = () => {
         userInfo: user,
         problemNameOfForm: problemNameOfForm,
       });
-      const data = res.data;
-      console.log("data received from backend", data);
+      // const data = res.data;
+      if (res.status === 200) {
+        setSuccess("Problem updated successfully");
+        setFormData({
+          problemName: "",
+          description: "",
+          authorName: "",
+          difficulty: "",
+          constraints: "",
+        });
+        setTags([""]);
+        setTestCases([{ input: "", output: "" }]);
+      }
+      // console.log("data received from backend", data);
       setError("");
     } catch (error) {
       if (error.response) {
@@ -133,8 +146,20 @@ const Admin = () => {
           problemNameOfForm: problemNameOfForm,
         },
       });
-      const data = res.data;
-      console.log("data received from backend", data);
+      // const data = res.data;
+      if (res.status === 200) {
+        setSuccess("Problem deleted successfully");
+        setFormData({
+          problemName: "",
+          description: "",
+          authorName: "",
+          difficulty: "",
+          constraints: "",
+        });
+        setTags([""]);
+        setTestCases([{ input: "", output: "" }]);
+      }
+      // console.log("data received from backend", data);
       setError("");
     } catch (error) {
       if (error.response) {
@@ -274,7 +299,7 @@ const Admin = () => {
                   key={index}
                   className="flex flex-col md:flex-row gap-2 mb-2"
                 >
-                  <input
+                  <textarea
                     type="text"
                     placeholder="Input"
                     value={testCase.input}
@@ -283,7 +308,7 @@ const Admin = () => {
                     }
                     className="flex-1 border px-4 py-2 rounded"
                   />
-                  <input
+                  <textarea
                     type="text"
                     placeholder="Output"
                     value={testCase.output}
@@ -332,6 +357,7 @@ const Admin = () => {
           </form>
         )}
         {error && <div className="text-red-500">{error}</div>}
+        {success && <div className="text-green-500">{success}</div>}
       </div>
     </div>
   );

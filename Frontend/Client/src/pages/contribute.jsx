@@ -214,7 +214,7 @@ const Contribute = () => {
           </label>
           {testCases.map((tc, index) => (
             <div key={index} className="flex flex-col sm:flex-row gap-2 mb-2">
-              <input
+              <textarea
                 type="text"
                 value={tc.input}
                 onChange={(e) =>
@@ -223,7 +223,7 @@ const Contribute = () => {
                 className="w-full sm:w-1/2 border px-4 py-2 rounded-md"
                 placeholder={`Input ${index + 1}`}
               />
-              <input
+              <textarea
                 type="text"
                 value={tc.output}
                 onChange={(e) =>

@@ -1,14 +1,16 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import Editor from "@monaco-editor/react";
 
 const CompilerPage = () => {
   const [language, setLanguage] = useState("cpp");
   const [code, setCode] = useState("// Write your code here");
-  const [input, setInput] = useState("");
-  const [output, setOutput] = useState("");
+  const [input, setInput] = useState([""]);
+  const [output, setOutput] = useState([""]);
 
   const handleRun = () => {
-    setOutput(`Running ${language.toUpperCase()}...\n\nCode:\n${code}\n\nInput:\n${input}`);
+    setOutput(
+      `Running ${language.toUpperCase()}...\n\nCode:\n${code}\n\nInput:\n${input}`
+    );
   };
 
   const handleSubmit = () => {
