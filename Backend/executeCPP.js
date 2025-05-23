@@ -15,37 +15,51 @@ const executeCPP = (filePath, input = "") => {
   return new Promise((resolve, reject) => {
     const compile = spawn("g++", [filePath, "-o", outPath]);
 
+    let compileError = "";
+
+    compile.stderr.on("data", (data) => {
+      compileError += data.toString();
+    });
+
     compile.on("exit", (code) => {
       if (code !== 0) {
-        return reject(`Compilation failed with exit code ${code}`);
+        return resolve({
+          success: false,
+          error: `Compilation Error:\n${compileError}`,
+        });
       }
 
       const run = spawn(outPath, [], { cwd: outputPath });
 
-      let result = "";
-      let error = "";
+      let output = "";
+      let runtimeError = "";
 
-      run.stdin.write(input);
-      run.stdin.end();
+      // 💡 Safely pass multiline input
+      run.stdin.write(input, "utf-8", () => {
+        run.stdin.end();
+      });
 
       run.stdout.on("data", (data) => {
-        result += data.toString();
+        output += data.toString();
       });
 
       run.stderr.on("data", (data) => {
-        error += data.toString();
+        runtimeError += data.toString();
       });
 
       run.on("close", (code) => {
-        if (code !== 0) {
-          return reject(`Runtime Error:\n${error}`);
+        if (code !== 0 || runtimeError) {
+          return resolve({
+            success: false,
+            error: `Runtime Error:\n${runtimeError}`,
+          });
         }
-        return resolve(result);
-      });
-    });
 
-    compile.stderr.on("data", (data) => {
-      reject(`Compilation Error:\n${data.toString()}`);
+        return resolve({
+          success: true,
+          output,
+        });
+      });
     });
   });
 };

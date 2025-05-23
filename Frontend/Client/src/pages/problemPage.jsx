@@ -12,6 +12,7 @@ const ProblemPage = () => {
   const [input, setInput] = useState([""]);
   const [output, setOutput] = useState([""]);
   const [error, setError] = useState("");
+  const [accept, setAccept] = useState("");
   const handleRun = async (e) => {
     e.preventDefault();
     try {
@@ -23,6 +24,7 @@ const ProblemPage = () => {
       });
       setOutput(res.data.output);
       setError("");
+      setAccept("");
     } catch (error) {
       if (error.response) {
         const status = error.response.status;
@@ -36,7 +38,7 @@ const ProblemPage = () => {
         } else if (status == 403) {
           setError(message);
         } else if (status == 405) {
-          setError(message);
+          setOutput("Compilation Error,Choose the correct language!");
         }
       } else {
         console.error(error);
@@ -44,8 +46,50 @@ const ProblemPage = () => {
     }
   };
 
-  const handleSubmit = () => {
-    setOutput(`Code submitted successfully in ${language.toUpperCase()}!`);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await axios.post("http://localhost:8000/submit", {
+        language,
+        code,
+        problemName,
+      });
+      const allPassed = res.data.results.every(
+        (result) => result.verdict === "Accepted"
+      );
+      setAccept(allPassed ? "Accepted" : "Failed");
+
+      setOutput(
+        res.data.results
+          .map(
+            (result, idx) =>
+              `Test Case ${idx + 1}: ${result.verdict}\nInput: ${
+                result.input
+              }\nExpected: ${result.expectedOutput}\nReceived: ${
+                result.receivedOutput
+              }\n`
+          )
+          .join("\n")
+      );
+
+      setError("");
+    } catch (error) {
+      if (error.response) {
+        const status = error.response.status;
+        const message = error.response.data;
+        if (status == 401) {
+          setError(message);
+        } else if (status == 402) {
+          setError(message);
+        } else if (status == 403) {
+          setError(message);
+        } else if (status == 405) {
+          setOutput("Compilation Error,Choose the correct language!");
+        }
+      } else {
+        console.error(error);
+      }
+    }
   };
 
   useEffect(() => {
@@ -119,8 +163,8 @@ const ProblemPage = () => {
             >
               <option value="cpp">C++</option>
               <option value="java">Java</option>
-              <option value="python">Python</option>
-              <option value="javascript">JavaScript</option>
+              <option value="py">Python</option>
+              <option value="js">JavaScript</option>
             </select>
           </div>
 
@@ -177,6 +221,16 @@ const ProblemPage = () => {
             <label htmlFor="output" className="block font-semibold mb-2">
               Output:
             </label>
+            {accept && (
+              <div
+                className={
+                  accept === "Accepted" ? "text-green-500" : "text-red-500"
+                }
+              >
+                {accept}
+              </div>
+            )}
+
             <textarea
               id="output"
               value={output}

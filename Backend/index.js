@@ -329,6 +329,7 @@ app.post("/run", async (req, res) => {
   try {
     const { input, problemName, language, code } = req.body;
     // console.log("Input received in backend", input);
+    // console.log("Size of Input", input.length);
     // console.log("problemName received in backend", problemName);
     // console.log("language received in backend", language);
     // console.log("code received in backend", code);
@@ -341,20 +342,105 @@ app.post("/run", async (req, res) => {
     }
     if (language === undefined) res.status(402).send("Choose the language");
     if (code === undefined) res.status(403).send("Write the complete code");
-    const existingProblem = await Problem.findOne({ problemName });
-    const testCases = existingProblem.testCases;
-    // console.log("TestCases of the Problem", testCases);
     const filePath = generateFile(language, code);
-    const output = await executeCPP(filePath, input);
-    console.log("Output received for the Problem", output);
+    const result = await executeCPP(filePath, input);
+    // console.log("Output received for the Problem", result.output);
+    if (!result.success) {
+      return res.status(405).json({ error: result.error });
+    }
+    // console.log("Output Size for the Problem", output.length);
     res.status(200).json({
-      output,
+      output: result.output,
     });
   } catch (error) {
     console.error("Error while running the code", error);
     res.status(500).send("Internal Server Error");
   }
 });
+app.post("/submit", async (req, res) => {
+  try {
+    const { language, code, problemName } = req.body;
+    // console.log("Language for Submit in backend", language);
+    // console.log("Code for Submit in backend", code);
+    // console.log("Problem Name for Submit in backend", problemName);
+
+    if (!problemName) {
+      return res.status(401).send("Problem name is not defined");
+    }
+    if (!language) {
+      return res.status(402).send("Choose the language");
+    }
+    if (!code) {
+      return res.status(403).send("Write the complete code");
+    }
+
+    const existingProblem = await Problem.findOne({ problemName });
+    const testCases = existingProblem.testCases;
+
+    const filePath = generateFile(language, code);
+
+    const results = [];
+
+    for (let i = 0; i < testCases.length; i++) {
+      const testInput = testCases[i].input;
+      const expectedOutput = testCases[i].output;
+      // console.log("Input for Submission", testInput);
+      // console.log("Expected Output for Submission", expectedOutput);
+
+      const result = await executeCPP(filePath, testInput);
+      // console.log("Output received for Submission", result.output);
+      if (result.output === expectedOutput) {
+      }
+      if (!result.success) {
+        results.push({
+          input: testInput,
+          success: false,
+          error: result.error,
+          expectedOutput,
+          receivedOutput: null,
+          verdict: "Compilation/Runtime Error",
+        });
+        continue;
+      }
+      /*
+        To make the comparison robust, normalize both outputs by:
+          1.Splitting them into lines
+          2.Trimming each line
+          3.Removing empty lines
+          4.Comparing line by line
+      */
+      const normalize = (text) =>
+        text
+          .trim()
+          .split("\n")
+          .map((line) => line.trim())
+          .filter((line) => line.length > 0)
+          .join("\n");
+
+      const receivedOutput = normalize(result.output);
+      const expectedTrimmed = normalize(expectedOutput);
+      // console.log("Expected Normalized Output", expectedOutput);
+      // console.log("Received Normalized Output output", receivedOutput);
+
+      const passed = receivedOutput === expectedTrimmed;
+
+      results.push({
+        input: testInput,
+        expectedOutput: expectedTrimmed,
+        receivedOutput,
+        success: true,
+        verdict: passed ? "Accepted" : "Wrong Answer",
+      });
+    }
+
+    // console.log("Result of Submission", results);
+    res.status(200).json({ results });
+  } catch (error) {
+    console.error("Error while running the code", error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
 app.listen(PORT, () => {
   console.log("Server is running on port 8000");
 });
