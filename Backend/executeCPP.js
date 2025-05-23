@@ -34,7 +34,6 @@ const executeCPP = (filePath, input = "") => {
       let output = "";
       let runtimeError = "";
 
-      // 💡 Safely pass multiline input
       run.stdin.write(input, "utf-8", () => {
         run.stdin.end();
       });
