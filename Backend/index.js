@@ -145,6 +145,7 @@ app.post("/contribute", async (req, res) => {
       tags,
       constraints,
       testCases,
+      userName,
     } = req.body;
     if (
       !problemName ||
@@ -161,6 +162,7 @@ app.post("/contribute", async (req, res) => {
     if (existingProblem) {
       res.status(400).send("Problem Name Should be Unique.");
     }
+    const existingUser = await User.findOne({ userName });
     // console.log("Problem Name from backend ", problemName);
     // console.log("description from backend ", description);
     // console.log("authorName from backend ", authorName);
@@ -177,6 +179,8 @@ app.post("/contribute", async (req, res) => {
       constraints,
       testCases,
     });
+    existingUser.problemsContributed = existingUser.problemsContributed + 1;
+    await existingUser.save();
     // console.log(problem);
     res.status(200).send("Problem Contributed Successfully");
   } catch (error) {
@@ -324,10 +328,25 @@ app.get("/problems/:problemName", async (req, res) => {
     return res.status(500).send("Internal Server Error");
   }
 });
+//route to find the user find the userName
+app.get("/users/:userName", async (req, res) => {
+  try {
+    const { userName } = req.params;
+    const existingUser = await User.findOne({ userName });
+    if (!existingUser) {
+      res.status(404).send("User not found");
+    }
+    res.status(200).send(existingUser);
+  } catch (error) {
+    console.error("Error while fetching problem using problemName", error);
+    return res.status(500).send("Internal Server Error");
+  }
+});
 //api for running the code
 app.post("/run", async (req, res) => {
   try {
     const { input, problemName, language, code } = req.body;
+    // console.log("for Running the Code");
     // console.log("Input received in backend", input);
     // console.log("Size of Input", input.length);
     // console.log("problemName received in backend", problemName);
@@ -348,7 +367,6 @@ app.post("/run", async (req, res) => {
     if (!result.success) {
       return res.status(405).json({ error: result.error });
     }
-    // console.log("Output Size for the Problem", output.length);
     res.status(200).json({
       output: result.output,
     });
@@ -359,10 +377,12 @@ app.post("/run", async (req, res) => {
 });
 app.post("/submit", async (req, res) => {
   try {
-    const { language, code, problemName } = req.body;
+    const { language, code, problemName, userName } = req.body;
+
     // console.log("Language for Submit in backend", language);
     // console.log("Code for Submit in backend", code);
     // console.log("Problem Name for Submit in backend", problemName);
+    // console.log("UserName in Submit from backend", userName);
 
     if (!problemName) {
       return res.status(401).send("Problem name is not defined");
@@ -375,22 +395,25 @@ app.post("/submit", async (req, res) => {
     }
 
     const existingProblem = await Problem.findOne({ problemName });
+    if (!existingProblem) {
+      return res.status(404).send("Problem not found");
+    }
+
     const testCases = existingProblem.testCases;
-
     const filePath = generateFile(language, code);
-
     const results = [];
 
     for (let i = 0; i < testCases.length; i++) {
       const testInput = testCases[i].input;
       const expectedOutput = testCases[i].output;
+
       // console.log("Input for Submission", testInput);
       // console.log("Expected Output for Submission", expectedOutput);
 
       const result = await executeCPP(filePath, testInput);
+
       // console.log("Output received for Submission", result.output);
-      if (result.output === expectedOutput) {
-      }
+
       if (!result.success) {
         results.push({
           input: testInput,
@@ -402,12 +425,13 @@ app.post("/submit", async (req, res) => {
         });
         continue;
       }
+
       /*
         To make the comparison robust, normalize both outputs by:
-          1.Splitting them into lines
-          2.Trimming each line
-          3.Removing empty lines
-          4.Comparing line by line
+          1. Splitting them into lines
+          2. Trimming each line
+          3. Removing empty lines
+          4. Comparing line by line
       */
       const normalize = (text) =>
         text
@@ -419,7 +443,8 @@ app.post("/submit", async (req, res) => {
 
       const receivedOutput = normalize(result.output);
       const expectedTrimmed = normalize(expectedOutput);
-      // console.log("Expected Normalized Output", expectedOutput);
+
+      // console.log("Expected Normalized Output", expectedTrimmed);
       // console.log("Received Normalized Output output", receivedOutput);
 
       const passed = receivedOutput === expectedTrimmed;
@@ -431,6 +456,24 @@ app.post("/submit", async (req, res) => {
         success: true,
         verdict: passed ? "Accepted" : "Wrong Answer",
       });
+    }
+
+    const existingUser = await User.findOne({ userName });
+    if (!existingUser) {
+      return res.status(405).send("User not found");
+    }
+
+    const allPassed = results.every((result) => result.verdict === "Accepted");
+
+    if (allPassed) {
+      const problem = {
+        problemName,
+        difficulty: existingProblem.difficulty,
+        language,
+        code,
+      };
+      existingUser.problemsSolved.push(problem);
+      await existingUser.save();
     }
 
     // console.log("Result of Submission", results);

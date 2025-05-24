@@ -7,17 +7,56 @@ import Admin from "./pages/admin";
 import Login from "./pages/Login";
 import Home from "./pages/Home";
 import Register from "./pages/Register";
+import PrivateRoute from "./components/PrivateRoute";
+import UserDetails from "./pages/UserDetails";
 
 function App() {
+  // const user = JSON.parse(localStorage.getItem("user"));
   return (
     <BrowserRouter>
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/problems" element={<Problems />} />
-        <Route path="/problems/:problemName" element={<ProblemPage />} />
-        <Route path="/contribute" element={<Contribute />} />
-        <Route path="/admin" element={<Admin />} />
+        <Route
+          path="/problems"
+          element={
+            <PrivateRoute>
+              <Problems />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/problems/:problemName"
+          element={
+            <PrivateRoute>
+              <ProblemPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/contribute"
+          element={
+            <PrivateRoute>
+              <Contribute />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/admin"
+          element={
+            <PrivateRoute>
+              <Admin />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <PrivateRoute>
+              <UserDetails />
+            </PrivateRoute>
+          }
+        />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
       </Routes>

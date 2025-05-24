@@ -13,6 +13,12 @@ const ProblemPage = () => {
   const [output, setOutput] = useState([""]);
   const [error, setError] = useState("");
   const [accept, setAccept] = useState("");
+  //taking the data of user from local storage
+  const storedUser = localStorage.getItem("user");
+  //parsing the data
+  const user = storedUser ? JSON.parse(storedUser) : null;
+  const userName = user.userName;
+  // console.log("user's data from localStorage in frontend", userName);
   const handleRun = async (e) => {
     e.preventDefault();
     try {
@@ -53,6 +59,7 @@ const ProblemPage = () => {
         language,
         code,
         problemName,
+        userName
       });
       const allPassed = res.data.results.every(
         (result) => result.verdict === "Accepted"

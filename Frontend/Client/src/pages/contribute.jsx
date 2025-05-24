@@ -46,13 +46,18 @@ const Contribute = () => {
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
-
+  //taking the data of user from local storage
+  const storedUser = localStorage.getItem("user");
+  //parsing the data
+  const user = storedUser ? JSON.parse(storedUser) : null;
+  const userName = user.userName;
   const handleSubmit = async (e) => {
     e.preventDefault();
     const payload = {
       ...formData,
       tags,
       testCases,
+      userName,
     };
     if (
       !formData.problemName ||
