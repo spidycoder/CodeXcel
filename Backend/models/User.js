@@ -50,10 +50,12 @@ const userSchema = new mongoose.Schema({
   },
   problemsContributed: {
     type: Number,
+    required:false,
     default: 0,
   },
   problemsSolved: {
     type: [problemSchema],
+    required: false,
     default: [],
   },
 });

@@ -41,7 +41,7 @@ app.post("/register", async (req, res) => {
       !collegeName ||
       !password ||
       !confirmPassword ||
-      password.length < 8
+      password.length < 5
     ) {
       return res.status(400).json({
         message:
