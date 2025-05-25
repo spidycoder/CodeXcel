@@ -7,6 +7,10 @@ const jwt = require("jsonwebtoken");
 const cors = require("cors");
 const { generateFile } = require("./generateFile");
 const { executeCPP } = require("./executeCPP");
+const { executePython } = require("./executePython");
+const { executeJS } = require("./executeJS");
+const { generateInputFile } = require("./generateInputFile");
+const { executeJava } = require("./executeJava");
 
 const app = express();
 app.use(cors());
@@ -352,22 +356,31 @@ app.post("/run", async (req, res) => {
     // console.log("problemName received in backend", problemName);
     // console.log("language received in backend", language);
     // console.log("code received in backend", code);
-
     if (input.length == 0) {
-      res.status(400).send("Fill the input");
+      return res.status(400).send("Fill the input");
     }
     if (problemName === "") {
-      res.status(401).send("problem name is not defined");
+      return res.status(401).send("problem name is not defined");
     }
-    if (language === undefined) res.status(402).send("Choose the language");
-    if (code === undefined) res.status(403).send("Write the complete code");
+    if (language === undefined)
+      return res.status(402).send("Choose the language");
+    if (code === undefined)
+      return res.status(403).send("Write the complete code");
     const filePath = generateFile(language, code);
-    const result = await executeCPP(filePath, input);
-    // console.log("Output received for the Problem", result.output);
-    if (!result.success) {
-      return res.status(405).json({ error: result.error });
+    const inputPath = generateInputFile(input);
+    let result;
+    if (language === "cpp") {
+      result = await executeCPP(filePath, input);
+    } else if (language === "py") {
+      result = await executePython(filePath, inputPath);
+    } else if (language === "java") {
+      result = await executeJava(filePath, inputPath);
+    } else if (language === "js") {
+      result = await executeJS(filePath, inputPath);
     }
-    res.status(200).json({
+    // console.log("Output received for the Problem", result);
+    if (!result.success) return res.status(405).send(result.error);
+    return res.status(200).json({
       output: result.output,
     });
   } catch (error) {
@@ -375,6 +388,7 @@ app.post("/run", async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 });
+
 app.post("/submit", async (req, res) => {
   try {
     const { language, code, problemName, userName } = req.body;
@@ -400,6 +414,7 @@ app.post("/submit", async (req, res) => {
     }
 
     const testCases = existingProblem.testCases;
+    // console.log("TestCases for the problem", testCases);
     const filePath = generateFile(language, code);
     const results = [];
 
@@ -409,9 +424,19 @@ app.post("/submit", async (req, res) => {
 
       // console.log("Input for Submission", testInput);
       // console.log("Expected Output for Submission", expectedOutput);
-
-      const result = await executeCPP(filePath, testInput);
-
+      const inputFile = generateInputFile(testInput);
+      // console.log("Input file for Submission", inputFile);
+      let result;
+      if (language === "cpp") {
+        result = await executeCPP(filePath, testInput);
+      } else if (language === "py") {
+        result = await executePython(filePath, inputFile);
+      } else if (language === "java") {
+        result = await executeJava(filePath, inputFile);
+      } else if (language === "js") {
+        result = await executeJS(filePath, inputFile);
+      }
+      // console.log("Result for above testCase", result);
       // console.log("Output received for Submission", result.output);
 
       if (!result.success) {

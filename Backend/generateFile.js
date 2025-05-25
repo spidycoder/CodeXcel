@@ -9,8 +9,14 @@ if (!fs.existsSync(dirCode)) {
 }
 
 const generateFile = (language, code) => {
-  const jobId = uuid();
-  const fileName = `${jobId}.${language}`;
+  let fileName;
+  //Java requires the public class name and file name to match
+  if (language === "java") {
+    fileName = `Main.java`;
+  } else {
+    const jobId = uuid();
+    fileName = `${jobId}.${language}`;
+  }
   const filePath = path.join(dirCode, fileName);
   fs.writeFileSync(filePath, code);
   return filePath;

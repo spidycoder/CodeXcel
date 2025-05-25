@@ -44,7 +44,7 @@ const ProblemPage = () => {
         } else if (status == 403) {
           setError(message);
         } else if (status == 405) {
-          setOutput("Compilation Error,Choose the correct language!");
+          setOutput(message);
         }
       } else {
         console.error(error);
@@ -59,7 +59,7 @@ const ProblemPage = () => {
         language,
         code,
         problemName,
-        userName
+        userName,
       });
       const allPassed = res.data.results.every(
         (result) => result.verdict === "Accepted"
@@ -91,7 +91,7 @@ const ProblemPage = () => {
         } else if (status == 403) {
           setError(message);
         } else if (status == 405) {
-          setOutput("Compilation Error,Choose the correct language!");
+          setOutput(message);
         }
       } else {
         console.error(error);
@@ -241,6 +241,7 @@ const ProblemPage = () => {
             <textarea
               id="output"
               value={output}
+              placeholder="Output will be displayed here..."
               readOnly
               rows={8}
               className="w-full border rounded px-4 py-2 bg-gray-200 font-mono"

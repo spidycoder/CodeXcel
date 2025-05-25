@@ -181,7 +181,7 @@ const Register = () => {
             <input
               type="password"
               id="password"
-              placeholder="••••••••"
+              placeholder="must be at least 5 length"
               name="password"
               onChange={handleChange}
               className="px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
@@ -198,7 +198,7 @@ const Register = () => {
             <input
               type="password"
               id="confirmPassword"
-              placeholder="••••••••"
+              placeholder="same as above"
               name="confirmPassword"
               onChange={handleChange}
               className="px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"

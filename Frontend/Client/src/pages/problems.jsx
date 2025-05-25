@@ -101,11 +101,11 @@ const Problems = () => {
         <p>No problems found.</p>
       ) : (
         <ul className="space-y-4">
-          {filteredProblems.map((problem) => (
-            <li key={problem._id} className="border p-4 rounded shadow">
+          {filteredProblems.map((problem,index) => (
+            <li key={index} className="border p-4 rounded shadow">
               <h2 className="text-xl font-semibold">
                 <Link to={`/problems/${problem.problemName}`}>
-                  {problem.problemName}{" "}
+                  {index+1}.{problem.problemName}{" "}
                   <span
                     className={`${
                       problem.difficulty === "Easy"
