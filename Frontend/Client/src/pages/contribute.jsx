@@ -46,11 +46,11 @@ const Contribute = () => {
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
-  //taking the data of user from local storage
+
   const storedUser = localStorage.getItem("user");
-  //parsing the data
   const user = storedUser ? JSON.parse(storedUser) : null;
-  const userName = user.userName;
+  const userName = user?.userName || "";
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const payload = {
@@ -60,11 +60,11 @@ const Contribute = () => {
       userName,
     };
     if (
-      !formData.problemName ||
-      !formData.description ||
-      !formData.authorName ||
-      !formData.difficulty ||
-      !formData.constraints ||
+      !formData.problemName.trim() ||
+      !formData.description.trim() ||
+      !formData.authorName.trim() ||
+      !formData.difficulty.trim() ||
+      !formData.constraints.trim() ||
       tags.length === 0 ||
       testCases.length === 0
     ) {
@@ -73,8 +73,7 @@ const Contribute = () => {
     }
     try {
       const res = await axios.post("http://localhost:8000/contribute", payload);
-      console.log("Problem sent to backend", res.data);
-      if (res.status == 200) {
+      if (res.status === 200) {
         localStorage.setItem("token", res.data.token);
         window.location.href = "/problems";
       }
@@ -83,9 +82,7 @@ const Contribute = () => {
       if (error.response) {
         const status = error.response.status;
         const message = error.response.data;
-        if (status == 401) {
-          setError(message);
-        } else if (status == 400) {
+        if (status === 401 || status === 400) {
           setError(message);
         }
       } else {
@@ -95,68 +92,87 @@ const Contribute = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-4 sm:p-6 md:p-10 flex justify-center">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center py-10 px-4">
       <form
-        className="w-full sm:w-11/12 md:w-3/4 lg:w-2/3 xl:w-1/2 bg-white p-6 sm:p-8 rounded-lg shadow-md"
         onSubmit={handleSubmit}
+        className="w-full max-w-3xl bg-white shadow-lg rounded-lg p-8 sm:p-12"
       >
-        <h1 className="text-3xl font-bold mb-6 text-center text-gray-800">
-          Contribute
+        <h1 className="text-4xl font-extrabold text-gray-700 mb-8 text-center">
+          Contribute a Problem
         </h1>
 
         {/* Problem Name */}
-        <div className="mb-4">
-          <label className="block text-gray-700 font-semibold mb-1">
+        <div className="mb-6">
+          <label
+            htmlFor="problemName"
+            className="block text-gray-700 font-semibold mb-2"
+          >
             Problem Name
           </label>
           <input
+            id="problemName"
             type="text"
             name="problemName"
             onChange={handleChange}
-            className="w-full border px-4 py-2 rounded-md"
             placeholder="Unique problem name"
+            className="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
           />
         </div>
 
         {/* Description */}
-        <div className="mb-4">
-          <label className="block text-gray-700 font-semibold mb-1">
+        <div className="mb-6">
+          <label
+            htmlFor="description"
+            className="block text-gray-700 font-semibold mb-2"
+          >
             Description
           </label>
           <textarea
+            id="description"
             name="description"
             onChange={handleChange}
-            rows={4}
-            className="w-full border px-4 py-2 rounded-md"
+            rows={5}
             placeholder="Enter a short description"
+            className="w-full border border-gray-300 rounded-md px-4 py-3 resize-y focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
           />
         </div>
 
         {/* Author Name */}
-        <div className="mb-4">
-          <label className="block text-gray-700 font-semibold mb-1">
+        <div className="mb-6">
+          <label
+            htmlFor="authorName"
+            className="block text-gray-700 font-semibold mb-2"
+          >
             Author Name
           </label>
           <input
+            id="authorName"
             type="text"
             name="authorName"
             onChange={handleChange}
-            className="w-full border px-4 py-2 rounded-md"
             placeholder="It should be your username"
+            className="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
           />
         </div>
 
-        {/* Difficulty Level */}
-        <div className="mb-4">
-          <label className="block text-gray-700 font-semibold mb-1">
+        {/* Difficulty */}
+        <div className="mb-6">
+          <label
+            htmlFor="difficulty"
+            className="block text-gray-700 font-semibold mb-2"
+          >
             Difficulty
           </label>
           <select
+            id="difficulty"
             name="difficulty"
             onChange={handleChange}
-            className="w-full border px-4 py-2 rounded-md"
+            className="w-full border border-gray-300 rounded-md px-4 py-3 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+            defaultValue=""
           >
-            <option value="">--Select--</option>
+            <option disabled value="">
+              -- Select Difficulty --
+            </option>
             <option>Easy</option>
             <option>Medium</option>
             <option>Hard</option>
@@ -164,25 +180,25 @@ const Contribute = () => {
         </div>
 
         {/* Tags */}
-        <div className="mb-4">
-          <label className="block text-gray-700 font-semibold mb-2">Tags</label>
+        <div className="mb-6">
+          <label className="block text-gray-700 font-semibold mb-3">Tags</label>
           {tags.map((tag, index) => (
             <div
               key={index}
-              className="flex flex-col sm:flex-row items-center mb-2 gap-2"
+              className="flex flex-col sm:flex-row items-center gap-3 mb-3"
             >
               <input
                 type="text"
                 value={tag}
                 onChange={(e) => handleTagChange(index, e.target.value)}
-                className="w-full flex-grow border px-4 py-2 rounded-md"
                 placeholder={`Tag ${index + 1}`}
+                className="flex-grow border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
               />
               {tags.length > 1 && (
                 <button
                   type="button"
                   onClick={() => removeTagBox(index)}
-                  className="bg-red-500 text-white px-3 py-1 rounded"
+                  className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md transition"
                 >
                   Remove
                 </button>
@@ -192,56 +208,63 @@ const Contribute = () => {
           <button
             type="button"
             onClick={addTagBox}
-            className="mt-2 bg-green-500 text-white px-4 py-2 rounded"
+            className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-md transition"
           >
             + Add Tag
           </button>
         </div>
 
         {/* Constraints */}
-        <div className="mb-4">
-          <label className="block text-gray-700 font-semibold mb-1">
+        <div className="mb-6">
+          <label
+            htmlFor="constraints"
+            className="block text-gray-700 font-semibold mb-2"
+          >
             Constraints
           </label>
           <input
+            id="constraints"
             type="text"
             name="constraints"
             onChange={handleChange}
-            className="w-full border px-4 py-2 rounded-md"
             placeholder="e.g., 1 ≤ N ≤ 10⁵"
+            className="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
           />
         </div>
 
         {/* Test Cases */}
-        <div className="mb-4">
-          <label className="block text-gray-700 font-semibold mb-2">
+        <div className="mb-8">
+          <label className="block text-gray-700 font-semibold mb-4">
             Test Cases
           </label>
           {testCases.map((tc, index) => (
-            <div key={index} className="flex flex-col sm:flex-row gap-2 mb-2">
+            <div
+              key={index}
+              className="flex flex-col sm:flex-row gap-4 mb-4 items-start"
+            >
               <textarea
-                type="text"
                 value={tc.input}
                 onChange={(e) =>
                   handleTestCaseChange(index, "input", e.target.value)
                 }
-                className="w-full sm:w-1/2 border px-4 py-2 rounded-md"
                 placeholder={`Input ${index + 1}`}
+                rows={3}
+                className="w-full sm:w-1/2 border border-gray-300 rounded-md px-4 py-3 resize-y focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
               />
               <textarea
-                type="text"
                 value={tc.output}
                 onChange={(e) =>
                   handleTestCaseChange(index, "output", e.target.value)
                 }
-                className="w-full sm:w-1/2 border px-4 py-2 rounded-md"
                 placeholder={`Output ${index + 1}`}
+                rows={3}
+                className="w-full sm:w-1/2 border border-gray-300 rounded-md px-4 py-3 resize-y focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
               />
               {testCases.length > 1 && (
                 <button
                   type="button"
                   onClick={() => removeTestcaseBox(index)}
-                  className="bg-red-500 text-white px-3 py-1 rounded"
+                  className="mt-1 sm:mt-0 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md transition self-start"
                 >
                   Remove
                 </button>
@@ -251,22 +274,26 @@ const Contribute = () => {
           <button
             type="button"
             onClick={addTestcaseBox}
-            className="bg-green-500 text-white px-4 py-2 rounded"
+            className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-md transition"
           >
             + Add Test Case
           </button>
         </div>
 
-        {/* Submit Button */}
+        {/* Submit */}
         <div className="text-center">
           <button
             type="submit"
-            className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
+            className="bg-indigo-600 hover:bg-indigo-700 text-white text-lg font-semibold px-8 py-3 rounded-md transition"
           >
             Submit Problem
           </button>
         </div>
-        {error && <div className="text-red-500">{error}</div>}
+
+        {/* Error Message */}
+        {error && (
+          <p className="mt-6 text-center text-red-600 font-semibold">{error}</p>
+        )}
       </form>
     </div>
   );

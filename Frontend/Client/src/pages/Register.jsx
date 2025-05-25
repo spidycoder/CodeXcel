@@ -13,12 +13,14 @@ const Register = () => {
     password: "",
     confirmPassword: "",
   });
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData);
+
     const {
       firstName,
       lastName,
@@ -28,22 +30,25 @@ const Register = () => {
       password,
       confirmPassword,
     } = formData;
+
     if (
-      firstName == "" ||
-      lastName == "" ||
-      email == "" ||
-      userName == "" ||
-      collegeName == "" ||
-      password == "" ||
-      confirmPassword == ""
+      firstName === "" ||
+      lastName === "" ||
+      email === "" ||
+      userName === "" ||
+      collegeName === "" ||
+      password === "" ||
+      confirmPassword === ""
     ) {
       setError("All fields are required");
       return;
     }
+
     if (password !== confirmPassword) {
       setError("Passwords do not match");
       return;
     }
+
     try {
       const res = await axios.post("http://localhost:8000/register", formData);
       if (res.status === 200) {
@@ -53,24 +58,21 @@ const Register = () => {
         };
         localStorage.setItem("user", JSON.stringify(userData));
         window.location.href = "/login";
-        console.log(
-          "User's Infro from Frontend from register's page",
-          userData
-        );
+        console.log("User's Info from Frontend (Register Page):", userData);
       }
       setError("");
     } catch (error) {
       if (error.response) {
         const status = error.response.status;
         const message = error.response.data;
-        if (status == 400) {
+        if (status === 400) {
           setError(message);
-        } else if (status == 401) {
-          setError("Password do not match");
-        } else if (status == 409) {
+        } else if (status === 401) {
+          setError("Passwords do not match");
+        } else if (status === 409) {
           setError("Email already exists");
-        } else if (status == 410) {
-          setError("UserName already exists");
+        } else if (status === 410) {
+          setError("Username already exists");
         }
       } else {
         setError("Network error. Please check your connection.");
@@ -78,162 +80,143 @@ const Register = () => {
       }
     }
   };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4">
       <div className="w-full max-w-md bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg">
         <h1 className="text-3xl font-bold text-center text-gray-800 dark:text-white mb-6">
           Register
         </h1>
+
         <form className="space-y-5" onSubmit={handleSubmit}>
-          {/* firstname Field */}
+          {/* First Name */}
           <div className="flex flex-col">
-            <label
-              htmlFor="firstName"
-              className="mb-1 text-gray-700 dark:text-gray-200"
-            >
+            <label htmlFor="firstName" className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
               First Name
             </label>
             <input
-              type="firstName"
+              type="text"
               id="firstName"
               name="firstName"
               placeholder="Aditya"
               onChange={handleChange}
-              className="px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
             />
           </div>
-          {/* lastName Field */}
+
+          {/* Last Name */}
           <div className="flex flex-col">
-            <label
-              htmlFor="lastName"
-              className="mb-1 text-gray-700 dark:text-gray-200"
-            >
+            <label htmlFor="lastName" className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
               Last Name
             </label>
             <input
-              type="lastName"
-              name="lastName"
+              type="text"
               id="lastName"
+              name="lastName"
               placeholder="Kumar"
               onChange={handleChange}
-              className="px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
             />
           </div>
-          {/*UserName */}
+
+          {/* Username */}
           <div className="flex flex-col">
-            <label
-              htmlFor="userName"
-              className="mb-1 text-gray-700 dark:text-gray-200"
-            >
-              User Name
+            <label htmlFor="userName" className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
+              Username
             </label>
             <input
-              type="userName"
+              type="text"
               id="userName"
               name="userName"
               placeholder="SpidyCoder"
               onChange={handleChange}
-              className="px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
             />
           </div>
-          {/* Email Field */}
+
+          {/* Email */}
           <div className="flex flex-col">
-            <label
-              htmlFor="email"
-              className="mb-1 text-gray-700 dark:text-gray-200"
-            >
+            <label htmlFor="email" className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
               Email
             </label>
             <input
               type="email"
-              name="email"
               id="email"
+              name="email"
               placeholder="you@example.com"
               onChange={handleChange}
-              className="px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
             />
           </div>
-          {/* College Name Field */}
+
+          {/* College Name */}
           <div className="flex flex-col">
-            <label
-              htmlFor="collegeName"
-              className="mb-1 text-gray-700 dark:text-gray-200"
-            >
+            <label htmlFor="collegeName" className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
               College Name
             </label>
             <input
-              type="collegeName"
-              name="collegeName"
+              type="text"
               id="collegeName"
+              name="collegeName"
+              placeholder="BIT MESRA"
               onChange={handleChange}
-              placeholder="BIT MESREA"
-              className="px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
             />
           </div>
-          {/* Password Field */}
+
+          {/* Password */}
           <div className="flex flex-col">
-            <label
-              htmlFor="password"
-              className="mb-1 text-gray-700 dark:text-gray-200"
-            >
+            <label htmlFor="password" className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
               Password
             </label>
             <input
               type="password"
               id="password"
-              placeholder="must be at least 5 length"
               name="password"
+              placeholder="Must be at least 5 characters"
               onChange={handleChange}
-              className="px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
             />
           </div>
-          {/* Confirm Password Field */}
+
+          {/* Confirm Password */}
           <div className="flex flex-col">
-            <label
-              htmlFor="confirmPassword"
-              className="mb-1 text-gray-700 dark:text-gray-200"
-            >
+            <label htmlFor="confirmPassword" className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
               Confirm Password
             </label>
             <input
               type="password"
               id="confirmPassword"
-              placeholder="same as above"
               name="confirmPassword"
+              placeholder="Same as above"
               onChange={handleChange}
-              className="px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
             />
           </div>
 
-          {/* Register Button */}
+          {/* Error Message */}
+          {error && (
+            <div className="flex items-start gap-2 bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded-md text-sm animate-pulse transition-all">
+              <span className="text-xl">⚠️</span>
+              <p>{error}</p>
+            </div>
+          )}
+
+          {/* Submit Button */}
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-md transition transform duration-200 shadow-md hover:shadow-lg hover:scale-[1.02]"
           >
             Register
           </button>
-          {/* Error Message */}
-          {error && <div className="text-red-500">{error}</div>}
+
+          {/* Login Link */}
           <div className="text-center text-gray-700 dark:text-white">
             Already registered?{" "}
-            <Link to="/login" className="text-red-500 hover:underline">
+            <Link to="/login" className="text-blue-600 hover:underline font-medium">
               Login Now
             </Link>
           </div>
-
-          {/* Google Log In */}
-          {/* <button
-            type="button"
-            className="w-full bg-white dark:bg-gray-700 text-black dark:text-white py-2 rounded-md border flex items-center justify-center gap-2 hover:bg-gray-100 dark:hover:bg-gray-600 transition"
-          >
-            <span>Log In with Google</span>
-            <img
-              src="https://cdn-icons-png.flaticon.com/512/2991/2991148.png"
-              height={20}
-              width={20}
-              alt="Google"
-            />
-          </button> */}
         </form>
       </div>
     </div>

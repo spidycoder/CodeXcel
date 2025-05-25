@@ -22,25 +22,29 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-white dark:bg-gray-900 shadow-md px-6 py-4">
-      <div className="max-w-7xl mx-auto flex justify-between items-center">
-        <Link to="/">
+    <nav className="bg-white dark:bg-gray-900 shadow-md sticky top-0 z-50">
+      <div className="max-w-7xl mx-auto px-6 py-3 flex justify-between items-center">
+        {/* Logo */}
+        <Link to="/" className="flex items-center gap-2">
           <img
             src="https://cdn-icons-png.flaticon.com/512/4997/4997543.png"
             alt="Logo"
             className="h-10 w-10"
           />
+          <span className="text-xl font-bold text-gray-800 dark:text-white">
+            CodeHub
+          </span>
         </Link>
 
         {/* Desktop Menu */}
-        <div className="hidden md:flex space-x-8 text-lg font-semibold text-gray-700 dark:text-white items-center">
-          <Link to="/problems" className="hover:text-blue-600">
+        <div className="hidden md:flex items-center space-x-6 text-base font-medium text-gray-700 dark:text-white">
+          <Link to="/problems" className="hover:text-blue-600 transition">
             Problems
           </Link>
-          <Link to="/contribute" className="hover:text-blue-600">
+          <Link to="/contribute" className="hover:text-blue-600 transition">
             Contribute
           </Link>
-          <Link to="/admin" className="hover:text-blue-600">
+          <Link to="/admin" className="hover:text-blue-600 transition">
             Admin
           </Link>
 
@@ -48,21 +52,24 @@ const Navbar = () => {
             <div className="relative">
               <button
                 onClick={toggleDropdown}
-                className="flex items-center gap-2 bg-gray-200 dark:bg-gray-700 px-3 py-1 rounded-full hover:bg-gray-300 dark:hover:bg-gray-600"
+                className="flex items-center gap-2 bg-gray-100 dark:bg-gray-700 px-3 py-1.5 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition"
               >
-                👤 {user.userName}
+                <span role="img" aria-label="user">
+                  👤
+                </span>{" "}
+                {user.userName}
               </button>
               {showDropdown && (
-                <div className="absolute right-0 mt-2 w-40 bg-white dark:bg-gray-800 shadow-md rounded z-10">
+                <div className="absolute right-0 mt-2 w-44 bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-md shadow-lg py-1 transition-all duration-150">
                   <Link
                     to="/profile"
-                    className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    className="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700"
                   >
                     Profile
                   </Link>
                   <button
                     onClick={handleLogout}
-                    className="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700"
                   >
                     Log Out
                   </button>
@@ -70,8 +77,11 @@ const Navbar = () => {
               )}
             </div>
           ) : (
-            <Link to="/login" className="hover:text-blue-600">
-              Login/Register
+            <Link
+              to="/login"
+              className="hover:text-blue-600 transition duration-150"
+            >
+              Login / Register
             </Link>
           )}
         </div>
@@ -83,7 +93,7 @@ const Navbar = () => {
             className="text-gray-700 dark:text-white focus:outline-none"
           >
             <svg
-              className="w-6 h-6"
+              className="w-7 h-7"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -108,9 +118,9 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Mobile Dropdown */}
+      {/* Mobile Menu */}
       {isOpen && (
-        <div className="md:hidden mt-2 px-4 space-y-2 text-gray-700 dark:text-white">
+        <div className="md:hidden bg-white dark:bg-gray-900 border-t dark:border-gray-800 px-6 pt-4 pb-6 space-y-3 text-gray-700 dark:text-white">
           <Link to="/problems" className="block hover:text-blue-600">
             Problems
           </Link>
@@ -128,14 +138,14 @@ const Navbar = () => {
               </Link>
               <button
                 onClick={handleLogout}
-                className="w-full text-left hover:text-blue-600"
+                className="block w-full text-left hover:text-blue-600"
               >
                 Log Out
               </button>
             </>
           ) : (
             <Link to="/login" className="block hover:text-blue-600">
-              Login/Register
+              Login / Register
             </Link>
           )}
         </div>
