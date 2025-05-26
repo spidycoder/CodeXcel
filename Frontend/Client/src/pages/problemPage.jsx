@@ -16,12 +16,13 @@ const ProblemPage = () => {
   const [error, setError] = useState("");
   const [accept, setAccept] = useState("");
   const [editorTheme, setEditorTheme] = useState("light");
+  const [showSubmissions, setShowSubmissions] = useState(false);
+  const [submissions, setSubmissions] = useState([]);
 
   const storedUser = localStorage.getItem("user");
   const user = storedUser ? JSON.parse(storedUser) : null;
   const userName = user?.userName;
 
-  // Custom hook to track window size for confetti
   const useWindowSize = () => {
     const [windowSize, setWindowSize] = useState({
       width: window.innerWidth,
@@ -121,11 +122,25 @@ const ProblemPage = () => {
       .catch((error) => console.error("Error fetching problem:", error));
   }, [problemName]);
 
+  useEffect(() => {
+    if (showSubmissions && userName) {
+      axios
+        .post("http://localhost:8000/submissions", {
+          userName,
+          problemName,
+        })
+        .then((res) => setSubmissions(res.data))
+        .catch((err) => console.error("Failed to fetch submissions", err));
+    }
+  }, [showSubmissions, userName, problemName]);
+
+  console.log("submissions from FrontendEnd", submissions);
+  console.log("submissions Size from FrontendEnd", submissions.length);
+  console.log("submissions Type from FrontendEnd", submissions.type);
   if (!problem) return <div className="p-6">Loading....</div>;
 
   return (
     <div className="min-h-screen bg-[#f9fafb] text-gray-800 p-4 relative">
-      {/* Confetti Celebration */}
       {accept === "Accepted" && (
         <ReactConfetti
           width={width}
@@ -136,160 +151,212 @@ const ProblemPage = () => {
         />
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* LEFT PANEL: Problem Details */}
-        <div className="bg-white p-6 rounded-lg shadow">
-          <h1 className="text-2xl font-bold mb-2">{problemName}</h1>
-          <p className="text-sm text-gray-600 mb-2">
-            Difficulty:{" "}
-            <span
-              className={`font-semibold ${
-                problem.difficulty === "Easy"
-                  ? "text-green-500"
-                  : problem.difficulty === "Medium"
-                  ? "text-yellow-500"
-                  : "text-red-500"
-              }`}
-            >
-              {problem.difficulty}
-            </span>
-          </p>
-          <p className="text-sm text-gray-600 mb-4">
-            Contributor: {problem.authorName}
-          </p>
+      <div className="mb-4">
+        <button
+          onClick={() => setShowSubmissions((prev) => !prev)}
+          className="bg-gray-700 text-white px-4 py-2 rounded hover:bg-gray-800"
+        >
+          {showSubmissions ? "Show Problem Details" : "Show My Submissions"}
+        </button>
+      </div>
 
-          <p className="mb-4">{problem.description}</p>
-          <p className="font-semibold mb-2">Constraints: {problem.constraints}</p>
+      {!showSubmissions ? (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="bg-white p-6 rounded-lg shadow">
+            <h1 className="text-2xl font-bold mb-2">{problemName}</h1>
+            <p className="text-sm text-gray-600 mb-2">
+              Difficulty:{" "}
+              <span
+                className={`font-semibold ${
+                  problem.difficulty === "Easy"
+                    ? "text-green-500"
+                    : problem.difficulty === "Medium"
+                    ? "text-yellow-500"
+                    : "text-red-500"
+                }`}
+              >
+                {problem.difficulty}
+              </span>
+            </p>
+            <p className="text-sm text-gray-600 mb-4">
+              Contributor: {problem.authorName}
+            </p>
+            <p className="mb-4">{problem.description}</p>
+            <p className="font-semibold mb-2">
+              Constraints: {problem.constraints}
+            </p>
 
-          <div className="mb-4">
-            <p className="font-semibold">Tags:</p>
-            <ul className="list-disc list-inside text-sm">
-              {problem.tags.map((tag, i) => (
-                <li key={i}>{tag}</li>
-              ))}
-            </ul>
+            <div className="mb-4">
+              <p className="font-semibold">Tags:</p>
+              <ul className="list-disc list-inside text-sm">
+                {problem.tags.map((tag, i) => (
+                  <li key={i}>{tag}</li>
+                ))}
+              </ul>
+            </div>
+
+            <div>
+              <p className="font-semibold mb-2">Sample Test Cases:</p>
+              <ul className="space-y-2">
+                {problem.testCases.map((tc, i) => (
+                  <li key={i} className="bg-gray-100 p-2 rounded border">
+                    <p>
+                      <strong>Input:</strong> {tc.input}
+                    </p>
+                    <p>
+                      <strong>Output:</strong> {tc.output}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
 
-          <div>
-            <p className="font-semibold mb-2">Sample Test Cases:</p>
-            <ul className="space-y-2">
-              {problem.testCases.map((tc, i) => (
-                <li key={i} className="bg-gray-100 p-2 rounded border">
-                  <p>
-                    <strong>Input:</strong> {tc.input}
+          {/* Editor & Controls */}
+          <div className="bg-white p-4 rounded-lg shadow flex flex-col gap-4">
+            {/* Language and Theme */}
+            <div className="flex justify-between items-center">
+              <div className="flex items-center gap-3">
+                <label className="font-medium">Language:</label>
+                <select
+                  value={language}
+                  onChange={(e) => setLanguage(e.target.value)}
+                  className="border rounded px-3 py-1"
+                >
+                  <option value="cpp">C++</option>
+                  <option value="java">Java</option>
+                  <option value="py">Python</option>
+                  <option value="js">JavaScript</option>
+                </select>
+              </div>
+              <button
+                onClick={() =>
+                  setEditorTheme((prev) =>
+                    prev === "light" ? "vs-dark" : "light"
+                  )
+                }
+                className="px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded"
+              >
+                {editorTheme === "light" ? "Dark Mode" : "Light Mode"}
+              </button>
+            </div>
+
+            {/* Editor */}
+            <div className="border rounded overflow-hidden">
+              <Editor
+                height="300px"
+                language={language}
+                theme={editorTheme}
+                value={code}
+                onChange={(value) => setCode(value)}
+                options={{
+                  fontSize: 14,
+                  minimap: { enabled: false },
+                  automaticLayout: true,
+                }}
+              />
+            </div>
+
+            {/* Buttons */}
+            <div className="flex gap-4 justify-center">
+              <button
+                onClick={handleRun}
+                disabled={isRunning}
+                className={`${
+                  isRunning ? "bg-blue-300" : "bg-blue-500 hover:bg-blue-600"
+                } text-white px-4 py-2 rounded w-full`}
+              >
+                {isRunning ? "Running..." : "Run"}
+              </button>
+              <button
+                onClick={handleSubmit}
+                disabled={isSubmitting}
+                className={`${
+                  isSubmitting
+                    ? "bg-green-300"
+                    : "bg-green-500 hover:bg-green-600"
+                } text-white px-4 py-2 rounded w-full`}
+              >
+                {isSubmitting ? "Submitting..." : "Submit"}
+              </button>
+            </div>
+
+            {/* IO Fields */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block font-semibold mb-1">
+                  Custom Input:
+                </label>
+                <textarea
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  rows={6}
+                  className="w-full border rounded p-2 bg-gray-50"
+                />
+              </div>
+              <div>
+                <label className="block font-semibold mb-1">Output:</label>
+                <textarea
+                  value={output}
+                  readOnly
+                  rows={6}
+                  className="w-full border rounded p-2 bg-gray-100 font-mono"
+                />
+              </div>
+            </div>
+
+            {accept && (
+              <p
+                className={`text-center font-bold ${
+                  accept === "Accepted" ? "text-green-600" : "text-red-600"
+                }`}
+              >
+                {accept}
+              </p>
+            )}
+            {error && (
+              <p className="text-red-600 font-semibold text-center mt-2">
+                {error}
+              </p>
+            )}
+          </div>
+        </div>
+      ) : (
+        <div className="bg-white p-6 rounded shadow">
+          <h2 className="text-xl font-bold mb-4">
+            My Submissions for "{problemName}"
+          </h2>
+          {submissions.length === 0 ? (
+            <p className="text-gray-500">No submissions yet.</p>
+          ) : (
+            <ul className="space-y-4">
+              {submissions.submissions.map((s, index) => (
+                <li key={index} className="border rounded p-4">
+                  <p className="text-sm text-gray-600">
+                    <strong>Language:</strong> {s.language.toUpperCase()} |{" "}
+                    <strong>Verdict:</strong>{" "}
+                    <span
+                      className={
+                        s.verdict === "Accepted"
+                          ? "text-green-600"
+                          : "text-red-600"
+                      }
+                    >
+                      {s.verdict}
+                    </span>
                   </p>
-                  <p>
-                    <strong>Output:</strong> {tc.output}
+                  <pre className="bg-gray-100 mt-2 p-2 rounded text-sm overflow-auto">
+                    {s.code}
+                  </pre>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Submitted: {new Date(s.createdAt).toLocaleString()}
                   </p>
                 </li>
               ))}
             </ul>
-          </div>
-        </div>
-
-        {/* RIGHT PANEL: Editor & Controls */}
-        <div className="bg-white p-4 rounded-lg shadow flex flex-col gap-4">
-          {/* Language and Theme Selector */}
-          <div className="flex justify-between items-center">
-            <div className="flex items-center gap-3">
-              <label className="font-medium">Language:</label>
-              <select
-                value={language}
-                onChange={(e) => setLanguage(e.target.value)}
-                className="border rounded px-3 py-1"
-              >
-                <option value="cpp">C++</option>
-                <option value="java">Java</option>
-                <option value="py">Python</option>
-                <option value="js">JavaScript</option>
-              </select>
-            </div>
-
-            <button
-              onClick={() =>
-                setEditorTheme((prev) => (prev === "light" ? "vs-dark" : "light"))
-              }
-              className="px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded"
-            >
-              {editorTheme === "light" ? "Dark Mode" : "Light Mode"}
-            </button>
-          </div>
-
-          {/* Code Editor */}
-          <div className="border rounded overflow-hidden">
-            <Editor
-              height="300px"
-              language={language}
-              theme={editorTheme}
-              value={code}
-              onChange={(value) => setCode(value)}
-              options={{
-                fontSize: 14,
-                minimap: { enabled: false },
-                automaticLayout: true,
-              }}
-            />
-          </div>
-
-          {/* Run & Submit Buttons */}
-          <div className="flex gap-4 justify-center">
-            <button
-              onClick={handleRun}
-              disabled={isRunning}
-              className={`${
-                isRunning ? "bg-blue-300" : "bg-blue-500 hover:bg-blue-600"
-              } text-white px-4 py-2 rounded w-full`}
-            >
-              {isRunning ? "Running..." : "Run"}
-            </button>
-            <button
-              onClick={handleSubmit}
-              disabled={isSubmitting}
-              className={`${
-                isSubmitting ? "bg-green-300" : "bg-green-500 hover:bg-green-600"
-              } text-white px-4 py-2 rounded w-full`}
-            >
-              {isSubmitting ? "Submitting..." : "Submit"}
-            </button>
-          </div>
-
-          {/* Input & Output Fields */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block font-semibold mb-1">Custom Input:</label>
-              <textarea
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                rows={6}
-                className="w-full border rounded p-2 bg-gray-50"
-              />
-            </div>
-            <div>
-              <label className="block font-semibold mb-1">Output:</label>
-              <textarea
-                value={output}
-                readOnly
-                rows={6}
-                className="w-full border rounded p-2 bg-gray-100 font-mono"
-              />
-            </div>
-          </div>
-
-          {accept && (
-            <p
-              className={`text-center font-bold ${
-                accept === "Accepted" ? "text-green-600" : "text-red-600"
-              }`}
-            >
-              {accept}
-            </p>
-          )}
-
-          {error && (
-            <p className="text-red-600 font-semibold text-center mt-2">{error}</p>
           )}
         </div>
-      </div>
+      )}
     </div>
   );
 };

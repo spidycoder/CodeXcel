@@ -11,6 +11,7 @@ const { executePython } = require("./executePython");
 const { executeJS } = require("./executeJS");
 const { generateInputFile } = require("./generateInputFile");
 const { executeJava } = require("./executeJava");
+const { aiCodeReview } = require("./aiCodeReview");
 
 const app = express();
 app.use(cors());
@@ -296,7 +297,26 @@ app.delete("/delete", async (req, res) => {
       return res.status(401).send("Unauthorized to delete this problem.");
     }
 
+    const existingUser = await User.findOne({ userName });
+
+    // Delete the problem
     await Problem.deleteOne({ problemName: problemNameOfForm });
+
+    // Update user's problemsContributed
+    existingUser.problemsContributed = existingUser.problemsContributed - 1;
+
+    // Remove from problemsSolved if present
+    if (
+      existingUser.problemsSolved.some(
+        (p) => p.problemName === problemNameOfForm
+      )
+    ) {
+      existingUser.problemsSolved = existingUser.problemsSolved.filter(
+        (problem) => problem.problemName !== problemNameOfForm
+      );
+    }
+
+    await existingUser.save();
 
     res.status(200).send("Problem deleted successfully");
   } catch (error) {
@@ -304,6 +324,7 @@ app.delete("/delete", async (req, res) => {
     res.status(500).send("Server Error");
   }
 });
+
 //route to find the problems
 app.get("/problems", async (req, res) => {
   try {
@@ -314,23 +335,22 @@ app.get("/problems", async (req, res) => {
     return res.status(500).send("Interal Server Error");
   }
 });
-app.post("/user",async(req,res)=>{
+//route to find all the solved problems of a user
+app.post("/user", async (req, res) => {
   try {
-    const {userName} = req.body;
+    const { userName } = req.body;
     const existingUser = await User.findOne({ userName });
-    if(!existingUser){
+    if (!existingUser) {
       return res.status(404).send("User not found");
     }
-    const solved=[];
-    for(let problem of existingUser.problemsSolved){
+    const solved = [];
+    for (let problem of existingUser.problemsSolved) {
       solved.push(problem.problemName);
     }
     // console.log("Solved Questions from Backend",solved);
     return res.status(200).json(solved);
-  } catch (error) {
-    
-  }
-})
+  } catch (error) {}
+});
 //route to find problem by name
 app.get("/problems/:problemName", async (req, res) => {
   try {
@@ -507,16 +527,15 @@ app.post("/submit", async (req, res) => {
 
     const allPassed = results.every((result) => result.verdict === "Accepted");
 
-    if (allPassed) {
-      const problem = {
-        problemName,
-        difficulty: existingProblem.difficulty,
-        language,
-        code,
-      };
-      existingUser.problemsSolved.push(problem);
-      await existingUser.save();
-    }
+    const problem = {
+      problemName,
+      difficulty: existingProblem.difficulty,
+      language,
+      code,
+      verdict: allPassed ? "Accepted" : "Wrong Answer",
+    };
+    existingUser.problemsSolved.push(problem);
+    await existingUser.save();
 
     // console.log("Result of Submission", results);
     res.status(200).json({ results });
@@ -525,7 +544,45 @@ app.post("/submit", async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 });
-
+//route to find the user's submissions for a problem
+app.post("/submissions", async (req, res) => {
+  try {
+    const { problemName, userName } = req.body;
+    if (!problemName) {
+      return res.status(401).send("Problem name is not defined");
+    }
+    if (!userName) {
+      return res.status(402).send("User name is not defined");
+    }
+    const existingUser = await User.findOne({ userName });
+    if (!existingUser) {
+      return res.status(404).send("User not found");
+    }
+    const submissions = existingUser.problemsSolved.filter(
+      (problem) => problem.problemName === problemName
+    );
+    // submissions.find().sort({ createdAt: -1 });
+    res.status(200).json({ submissions });
+  } catch (error) {
+    console.error("Error while fetching problem using problemName", error);
+    return res.status(500).send("Internal Server Error");
+  }
+});
+//route for AI reveiw
+app.post("/ai-review", async (req, res) => {
+  const { code } = req.body;
+  if (code === undefined) {
+    return res.status(404).json({ success: false, error: "Empty code!" });
+  }
+  try {
+    const review = await aiCodeReview(code);
+    res.json({ review: review });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: "Error in AI review, error: " + error.message });
+  }
+});
 app.listen(PORT, () => {
   console.log("Server is running on port 8000");
 });

@@ -17,8 +17,14 @@ const problemSchema = new mongoose.Schema(
       type: String,
       required: false,
     },
+    verdict: {
+      type: String,
+      required: false,
+      default: "Pending",
+    },
   },
-  { _id: false } 
+  { timestamps: true },
+  { _id: false }
 );
 
 const userSchema = new mongoose.Schema({
@@ -50,7 +56,7 @@ const userSchema = new mongoose.Schema({
   },
   problemsContributed: {
     type: Number,
-    required:false,
+    required: false,
     default: 0,
   },
   problemsSolved: {
