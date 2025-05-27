@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import Editor from "@monaco-editor/react";
 import ReactConfetti from "react-confetti";
+import AIReviewCard from "./AiReviewCard";
 
 const ProblemPage = () => {
   const { problemName } = useParams();
@@ -18,6 +19,9 @@ const ProblemPage = () => {
   const [editorTheme, setEditorTheme] = useState("light");
   const [showSubmissions, setShowSubmissions] = useState(false);
   const [submissions, setSubmissions] = useState([]);
+  const [aiReview, setAiReview] = useState("");
+  const [showAIReviewModal, setShowAIReviewModal] = useState(false);
+  const [aiReviewLoading, setAIReviewLoading] = useState(false);
 
   const storedUser = localStorage.getItem("user");
   const user = storedUser ? JSON.parse(storedUser) : null;
@@ -115,6 +119,32 @@ const ProblemPage = () => {
     }
   };
 
+  // Replace handleAIReview function with:
+  const handleAIReview = async () => {
+    setAIReviewLoading(true);
+    setShowAIReviewModal(true);
+    try {
+      const res = await axios.post("http://localhost:8000/ai-review", {
+        code,
+      });
+      setAiReview(res.data.review);
+      setError("");
+    } catch (error) {
+      const status = error.response?.status;
+      const message = error.response?.data;
+      if ([400, 401, 402, 403].includes(status)) {
+        setError(message);
+      } else if (status === 405) {
+        setOutput(message);
+      } else {
+        console.error(error);
+      }
+    } finally {
+      setAIReviewLoading(false);
+    }
+  };
+
+  console.log("Ai Review received from frontend", aiReview);
   useEffect(() => {
     axios
       .get(`http://localhost:8000/problems/${problemName}`)
@@ -134,9 +164,6 @@ const ProblemPage = () => {
     }
   }, [showSubmissions, userName, problemName]);
 
-  console.log("submissions from FrontendEnd", submissions);
-  console.log("submissions Size from FrontendEnd", submissions.length);
-  console.log("submissions Type from FrontendEnd", submissions.type);
   if (!problem) return <div className="p-6">Loading....</div>;
 
   return (
@@ -257,7 +284,6 @@ const ProblemPage = () => {
               />
             </div>
 
-            {/* Buttons */}
             <div className="flex gap-4 justify-center">
               <button
                 onClick={handleRun}
@@ -268,20 +294,29 @@ const ProblemPage = () => {
               >
                 {isRunning ? "Running..." : "Run"}
               </button>
-              <button
-                onClick={handleSubmit}
-                disabled={isSubmitting}
-                className={`${
-                  isSubmitting
-                    ? "bg-green-300"
-                    : "bg-green-500 hover:bg-green-600"
-                } text-white px-4 py-2 rounded w-full`}
-              >
-                {isSubmitting ? "Submitting..." : "Submit"}
-              </button>
+
+              {accept === "Accepted" ? (
+                <button
+                  onClick={handleAIReview}
+                  className="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded w-full"
+                >
+                  AI Review
+                </button>
+              ) : (
+                <button
+                  onClick={handleSubmit}
+                  disabled={isSubmitting}
+                  className={`${
+                    isSubmitting
+                      ? "bg-green-300"
+                      : "bg-green-500 hover:bg-green-600"
+                  } text-white px-4 py-2 rounded w-full`}
+                >
+                  {isSubmitting ? "Submitting..." : "Submit"}
+                </button>
+              )}
             </div>
 
-            {/* IO Fields */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block font-semibold mb-1">
@@ -319,6 +354,53 @@ const ProblemPage = () => {
                 {error}
               </p>
             )}
+            {showAIReviewModal && (
+              <>
+                {/* Dark backdrop */}
+                <div
+                  className="fixed inset-0 bg-black bg-opacity-50 z-40"
+                  onClick={() => setShowAIReviewModal(false)}
+                />
+
+                {/* Popup Modal */}
+                <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
+                  <div className="bg-white rounded-lg shadow-lg max-w-lg w-full p-6 relative">
+                    {/* Close button */}
+                    <button
+                      className="absolute top-2 right-2 text-gray-600 hover:text-gray-900 text-xl font-bold"
+                      onClick={() => setShowAIReviewModal(false)}
+                      aria-label="Close AI Review"
+                    >
+                      &times;
+                    </button>
+
+                    {/* Modal Content */}
+                    <h3 className="text-lg font-semibold mb-4 text-blue-600">
+                      AI Code Review
+                    </h3>
+
+                    {aiReviewLoading ? (
+                      <p className="text-gray-600">
+                        Your AI review is on the way...
+                      </p>
+                    ) : (
+                      <div className="whitespace-pre-line text-sm text-gray-800 max-h-64 overflow-y-auto p-3 border rounded bg-gray-50 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200">
+                        <AIReviewCard reviewText={aiReview} />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </>
+            )}
+
+            {aiReview && (
+              <button
+                onClick={handleAIReview}
+                className="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded w-full"
+              >
+                AI Review
+              </button>
+            )}
           </div>
         </div>
       ) : (
@@ -330,29 +412,35 @@ const ProblemPage = () => {
             <p className="text-gray-500">No submissions yet.</p>
           ) : (
             <ul className="space-y-4">
-              {submissions.submissions.map((s, index) => (
-                <li key={index} className="border rounded p-4">
-                  <p className="text-sm text-gray-600">
-                    <strong>Language:</strong> {s.language.toUpperCase()} |{" "}
-                    <strong>Verdict:</strong>{" "}
-                    <span
-                      className={
-                        s.verdict === "Accepted"
-                          ? "text-green-600"
-                          : "text-red-600"
-                      }
-                    >
-                      {s.verdict}
-                    </span>
-                  </p>
-                  <pre className="bg-gray-100 mt-2 p-2 rounded text-sm overflow-auto">
-                    {s.code}
-                  </pre>
-                  <p className="text-xs text-gray-500 mt-1">
-                    Submitted: {new Date(s.createdAt).toLocaleString()}
-                  </p>
-                </li>
-              ))}
+              {submissions.submissions.length === 0 ? (
+                <p className="text-gray-500">No submissions yet.</p>
+              ) : (
+                <ul className="space-y-4">
+                  {submissions.submissions.map((s, index) => (
+                    <li key={index} className="border rounded p-4">
+                      <p className="text-sm text-gray-600">
+                        <strong>Language:</strong> {s.language.toUpperCase()} |{" "}
+                        <strong>Verdict:</strong>{" "}
+                        <span
+                          className={
+                            s.verdict === "Accepted"
+                              ? "text-green-600"
+                              : "text-red-600"
+                          }
+                        >
+                          {s.verdict}
+                        </span>
+                      </p>
+                      <pre className="bg-gray-100 mt-2 p-2 rounded text-sm overflow-auto">
+                        {s.code}
+                      </pre>
+                      <p className="text-xs text-gray-500 mt-1">
+                        Submitted: {new Date(s.createdAt).toLocaleString()}
+                      </p>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </ul>
           )}
         </div>

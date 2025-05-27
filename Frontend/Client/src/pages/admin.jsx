@@ -17,8 +17,6 @@ const Admin = () => {
     constraints: "",
   });
 
-  
-
   const handleFormChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -52,9 +50,6 @@ const Admin = () => {
   };
   const storedUser = localStorage.getItem("user");
   const user = storedUser ? JSON.parse(storedUser) : null;
-  if (user) {
-    console.log("UserInfo from frontend from admin's page", user);
-  }
   const handleFindProblem = async (e) => {
     e.preventDefault();
     try {

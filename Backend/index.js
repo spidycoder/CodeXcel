@@ -575,7 +575,10 @@ app.post("/ai-review", async (req, res) => {
     return res.status(404).json({ success: false, error: "Empty code!" });
   }
   try {
+    // console.log("Code Received for AI Review", code);
+    // console.log("AI Code Review Requested");
     const review = await aiCodeReview(code);
+    // console.log("AI Review", review);
     res.json({ review: review });
   } catch (error) {
     res
@@ -583,6 +586,6 @@ app.post("/ai-review", async (req, res) => {
       .json({ error: "Error in AI review, error: " + error.message });
   }
 });
-app.listen(PORT, () => {
+app.listen(PORT || 8000, () => {
   console.log("Server is running on port 8000");
 });
