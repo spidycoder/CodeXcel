@@ -119,7 +119,6 @@ const ProblemPage = () => {
     }
   };
 
-  // Replace handleAIReview function with:
   const handleAIReview = async () => {
     setAIReviewLoading(true);
     setShowAIReviewModal(true);
@@ -144,7 +143,7 @@ const ProblemPage = () => {
     }
   };
 
-  console.log("Ai Review received from frontend", aiReview);
+  // console.log("Ai Review received from frontend", aiReview);
   useEffect(() => {
     axios
       .get(`http://localhost:8000/problems/${problemName}`)

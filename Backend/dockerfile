@@ -1,0 +1,47 @@
+# Use the official Node.js image based on Alpine Linux (a minimal Docker image)
+# This helps keep the image small and efficient while still supporting Node.js
+FROM node:20-alpine3.18
+
+# Set the working directory inside the container to /app
+# All following commands (like COPY and RUN) will operate relative to this directory
+WORKDIR /app
+
+# Install necessary packages inside the container
+# - apk update: Updates the Alpine package index
+# - apk add --no-cache: Installs packages without saving cache to reduce image size
+#   - g++: C++ compiler to compile C++ code
+#   - make: Utility used by many C/C++ projects during build
+#   - python3: Python interpreter
+#   - py3-pip: Package manager for Python
+#   - openjdk17: Java Development Kit version 17 to compile and run Java code
+#   - nodejs & npm: Already included, but explicitly added for completeness
+#   - bash: Helpful for running shell scripts or command execution
+RUN apk update && apk add --no-cache \
+    g++ \
+    make \
+    python3 \
+    py3-pip \
+    openjdk17 \
+    nodejs \
+    npm \
+    bash
+
+# Set JAVA_HOME environment variable so Java tools (javac, java) can find the JDK properly
+ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk
+ENV PATH="$JAVA_HOME/bin:${PATH}"
+
+# Copy the entire contents of your local project directory (e.g., your backend folder)
+# into the /app directory inside the Docker container
+COPY . .
+
+# Install all Node.js dependencies defined in package.json
+# This is required to run your backend service (e.g., Express server, etc.)
+RUN npm install
+
+# Inform Docker that the container listens on port 8000
+# Useful for Docker networking, but you still need to publish the port with -p when running
+EXPOSE 8000
+
+# Define the default command to run when the container starts
+# Here it starts your Node.js backend application (entry point should be index.js)
+CMD ["node", "index.js"]

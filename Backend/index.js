@@ -24,7 +24,7 @@ DBConnection();
 
 //routes
 app.get("/", (req, res) => {
-  res.status(200).send("Hello from Aadi Bhai");
+  res.status(200).send("Hello from Aditya Singh");
 });
 app.post("/register", async (req, res) => {
   try {
