@@ -68,7 +68,7 @@ const Contribute = () => {
       tags.length === 0 ||
       testCases.length === 0
     ) {
-      setError("All fields are required");
+      setError("⚠️ All fields are required!");
       return;
     }
     try {
@@ -83,7 +83,7 @@ const Contribute = () => {
         const status = error.response.status;
         const message = error.response.data;
         if (status === 401 || status === 400) {
-          setError(message);
+          setError(`🚫 ${message}`);
         }
       } else {
         console.error(error);
@@ -92,22 +92,26 @@ const Contribute = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center py-10 px-4">
+    <div className="min-h-screen bg-gray-50 py-10 px-4">
+      <div className="max-w-4xl mx-auto mb-10 text-center">
+        <h1 className="text-5xl font-extrabold text-gray-800 mb-2">
+          Contribute a Coding Problem
+        </h1>
+        <p className="text-gray-600 text-lg">
+          🚀 Share your own coding challenge and help the community grow!
+        </p>
+      </div>
+
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-3xl bg-white shadow-lg rounded-lg p-8 sm:p-12"
+        className="w-full max-w-3xl mx-auto bg-white shadow-lg rounded-lg p-8 sm:p-12 relative"
       >
-        <h1 className="text-4xl font-extrabold text-gray-700 mb-8 text-center">
-          Contribute a Problem
-        </h1>
-
-        {/* Problem Name */}
         <div className="mb-6">
           <label
             htmlFor="problemName"
             className="block text-gray-700 font-semibold mb-2"
           >
-            Problem Name
+            Problem Name 🏷️
           </label>
           <input
             id="problemName"
@@ -115,17 +119,16 @@ const Contribute = () => {
             name="problemName"
             onChange={handleChange}
             placeholder="Unique problem name"
-            className="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+            className="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
         </div>
 
-        {/* Description */}
         <div className="mb-6">
           <label
             htmlFor="description"
             className="block text-gray-700 font-semibold mb-2"
           >
-            Description
+            Description 📝
           </label>
           <textarea
             id="description"
@@ -133,17 +136,16 @@ const Contribute = () => {
             onChange={handleChange}
             rows={5}
             placeholder="Enter a short description"
-            className="w-full border border-gray-300 rounded-md px-4 py-3 resize-y focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+            className="w-full border border-gray-300 rounded-md px-4 py-3 resize-y focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
         </div>
 
-        {/* Author Name */}
         <div className="mb-6">
           <label
             htmlFor="authorName"
             className="block text-gray-700 font-semibold mb-2"
           >
-            Author Name
+            Author Name 🙋‍♂️
           </label>
           <input
             id="authorName"
@@ -151,56 +153,54 @@ const Contribute = () => {
             name="authorName"
             onChange={handleChange}
             placeholder="It should be your username"
-            className="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+            className="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
         </div>
 
-        {/* Difficulty */}
         <div className="mb-6">
           <label
             htmlFor="difficulty"
             className="block text-gray-700 font-semibold mb-2"
           >
-            Difficulty
+            Difficulty 🎯
           </label>
           <select
             id="difficulty"
             name="difficulty"
             onChange={handleChange}
-            className="w-full border border-gray-300 rounded-md px-4 py-3 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+            className="w-full border border-gray-300 rounded-md px-4 py-3 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
             defaultValue=""
           >
             <option disabled value="">
               -- Select Difficulty --
             </option>
-            <option>Easy</option>
-            <option>Medium</option>
-            <option>Hard</option>
+            <option>Easy 😎</option>
+            <option>Medium 🤔</option>
+            <option>Hard 😤</option>
           </select>
         </div>
 
-        {/* Tags */}
         <div className="mb-6">
-          <label className="block text-gray-700 font-semibold mb-3">Tags</label>
+          <label className="block text-gray-700 font-semibold mb-3">
+            Tags 🏷️
+          </label>
           {tags.map((tag, index) => (
-            <div
-              key={index}
-              className="flex flex-col sm:flex-row items-center gap-3 mb-3"
-            >
+            <div key={index} className="flex items-center gap-3 mb-3">
               <input
                 type="text"
                 value={tag}
                 onChange={(e) => handleTagChange(index, e.target.value)}
                 placeholder={`Tag ${index + 1}`}
-                className="flex-grow border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                className="flex-grow border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
               {tags.length > 1 && (
                 <button
                   type="button"
                   onClick={() => removeTagBox(index)}
-                  className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md transition"
+                  className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md"
+                  title="Remove Tag"
                 >
-                  Remove
+                  ❌
                 </button>
               )}
             </div>
@@ -208,19 +208,19 @@ const Contribute = () => {
           <button
             type="button"
             onClick={addTagBox}
-            className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-md transition"
+            className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-md"
+            title="Add Tag"
           >
-            + Add Tag
+            ➕ Add Tag
           </button>
         </div>
 
-        {/* Constraints */}
         <div className="mb-6">
           <label
             htmlFor="constraints"
             className="block text-gray-700 font-semibold mb-2"
           >
-            Constraints
+            Constraints ⚙️
           </label>
           <input
             id="constraints"
@@ -228,20 +228,16 @@ const Contribute = () => {
             name="constraints"
             onChange={handleChange}
             placeholder="e.g., 1 ≤ N ≤ 10⁵"
-            className="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+            className="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
         </div>
 
-        {/* Test Cases */}
         <div className="mb-8">
           <label className="block text-gray-700 font-semibold mb-4">
-            Test Cases
+            Test Cases 🧪
           </label>
           {testCases.map((tc, index) => (
-            <div
-              key={index}
-              className="flex flex-col sm:flex-row gap-4 mb-4 items-start"
-            >
+            <div key={index} className="flex flex-col sm:flex-row gap-4 mb-4">
               <textarea
                 value={tc.input}
                 onChange={(e) =>
@@ -249,7 +245,7 @@ const Contribute = () => {
                 }
                 placeholder={`Input ${index + 1}`}
                 rows={3}
-                className="w-full sm:w-1/2 border border-gray-300 rounded-md px-4 py-3 resize-y focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                className="w-full sm:w-1/2 border border-gray-300 rounded-md px-4 py-3 resize-y focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
               <textarea
                 value={tc.output}
@@ -258,15 +254,16 @@ const Contribute = () => {
                 }
                 placeholder={`Output ${index + 1}`}
                 rows={3}
-                className="w-full sm:w-1/2 border border-gray-300 rounded-md px-4 py-3 resize-y focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                className="w-full sm:w-1/2 border border-gray-300 rounded-md px-4 py-3 resize-y focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
               {testCases.length > 1 && (
                 <button
                   type="button"
                   onClick={() => removeTestcaseBox(index)}
-                  className="mt-1 sm:mt-0 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md transition self-start"
+                  className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md self-start"
+                  title="Remove Test Case"
                 >
-                  Remove
+                  ❌
                 </button>
               )}
             </div>
@@ -274,26 +271,29 @@ const Contribute = () => {
           <button
             type="button"
             onClick={addTestcaseBox}
-            className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-md transition"
+            className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-md"
+            title="Add Test Case"
           >
-            + Add Test Case
+            ➕ Add Test Case
           </button>
         </div>
 
-        {/* Submit */}
         <div className="text-center">
           <button
             type="submit"
-            className="bg-indigo-600 hover:bg-indigo-700 text-white text-lg font-semibold px-8 py-3 rounded-md transition"
+            className="bg-indigo-600 hover:bg-indigo-700 text-white text-lg font-semibold px-8 py-3 rounded-md"
           >
-            Submit Problem
+            🚀 Submit Problem
           </button>
         </div>
 
-        {/* Error Message */}
         {error && (
           <p className="mt-6 text-center text-red-600 font-semibold">{error}</p>
         )}
+
+        <div className="absolute bottom-4 right-4 text-3xl select-none pointer-events-none">
+          🎉
+        </div>
       </form>
     </div>
   );

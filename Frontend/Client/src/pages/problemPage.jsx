@@ -45,7 +45,6 @@ const ProblemPage = () => {
   };
 
   const { width, height } = useWindowSize();
-
   const handleRun = async (e) => {
     e.preventDefault();
     setIsRunning(true);
@@ -357,7 +356,7 @@ const ProblemPage = () => {
               <>
                 {/* Dark backdrop */}
                 <div
-                  className="fixed inset-0 bg-black bg-opacity-50 z-40"
+                  className="fixed inset-0 bg-blur bg-opacity-50 z-40"
                   onClick={() => setShowAIReviewModal(false)}
                 />
 

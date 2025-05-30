@@ -9,6 +9,7 @@ import Home from "./pages/Home";
 import Register from "./pages/Register";
 import PrivateRoute from "./components/PrivateRoute";
 import UserDetails from "./pages/UserDetails";
+import LeaderBoard from "./pages/LeaderBoard";
 
 function App() {
   // const user = JSON.parse(localStorage.getItem("user"));
@@ -42,6 +43,14 @@ function App() {
           }
         />
         <Route
+          path="/leaderboard"
+          element={
+            <PrivateRoute>
+              <LeaderBoard />
+            </PrivateRoute>
+          }
+        />
+        <Route
           path="/admin"
           element={
             <PrivateRoute>
@@ -50,7 +59,7 @@ function App() {
           }
         />
         <Route
-          path="/profile"
+          path="/profile/:userName"
           element={
             <PrivateRoute>
               <UserDetails />

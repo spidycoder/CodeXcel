@@ -20,7 +20,7 @@ const Navbar = () => {
     setUser(null);
     navigate("/");
   };
-
+  
   return (
     <nav className="bg-white dark:bg-gray-900 shadow-md sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-6 py-3 flex justify-between items-center">
@@ -44,6 +44,9 @@ const Navbar = () => {
           <Link to="/contribute" className="hover:text-blue-600 transition">
             Contribute
           </Link>
+          <Link to="/leaderboard" className="block hover:text-blue-600">
+            Leaderboard
+          </Link>
           <Link to="/admin" className="hover:text-blue-600 transition">
             Admin
           </Link>
@@ -62,7 +65,7 @@ const Navbar = () => {
               {showDropdown && (
                 <div className="absolute right-0 mt-2 w-44 bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-md shadow-lg py-1 transition-all duration-150">
                   <Link
-                    to="/profile"
+                    to={`/profile/${user.userName}`}
                     className="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700"
                   >
                     Profile
@@ -124,8 +127,12 @@ const Navbar = () => {
           <Link to="/problems" className="block hover:text-blue-600">
             Problems
           </Link>
+
           <Link to="/contribute" className="block hover:text-blue-600">
             Contribute
+          </Link>
+          <Link to="/leaderboard" className="block hover:text-blue-600">
+            Leaderboard
           </Link>
           <Link to="/admin" className="block hover:text-blue-600">
             Admin

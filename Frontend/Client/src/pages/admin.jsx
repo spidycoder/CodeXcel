@@ -48,22 +48,25 @@ const Admin = () => {
   const removeTestcaseBox = (index) => {
     setTestCases(testCases.filter((_, i) => i !== index));
   };
+
   const storedUser = localStorage.getItem("user");
   const user = storedUser ? JSON.parse(storedUser) : null;
+
   const handleFindProblem = async (e) => {
     e.preventDefault();
     try {
       if (problemNameOfForm === "") {
-        setError("fill the problem name correctly");
+        setError("⚠️ Please enter a problem name.");
         return;
       }
-      //here,we need to send the problemName as {problemName:problemNameOfForm}.
+
       const res = await axios.get("http://localhost:8000/admin", {
         params: {
           problemName: problemNameOfForm,
           userInfo: user,
         },
       });
+
       const data = res.data;
       setProblemData(data);
       setFormData({
@@ -80,14 +83,13 @@ const Admin = () => {
       if (error.response) {
         const status = error.response.status;
         const message = error.response.data;
-        if (status == 404) {
-          setError(message);
-        }
+        if (status === 404) setError(`❌ ${message}`);
       } else {
         console.error("Error fetching problem:", error);
       }
     }
   };
+
   const handleUpdateProblem = async (e) => {
     e.preventDefault();
     try {
@@ -96,14 +98,15 @@ const Admin = () => {
         tags,
         testCases,
       };
+
       const res = await axios.put("http://localhost:8000/admin", {
         problemInfo: payload,
         userInfo: user,
         problemNameOfForm: problemNameOfForm,
       });
-      // const data = res.data;
+
       if (res.status === 200) {
-        setSuccess("Problem updated successfully");
+        setSuccess("✅ Problem updated successfully!");
         setFormData({
           problemName: "",
           description: "",
@@ -114,22 +117,17 @@ const Admin = () => {
         setTags([""]);
         setTestCases([{ input: "", output: "" }]);
       }
-      // console.log("data received from backend", data);
       setError("");
     } catch (error) {
       if (error.response) {
-        const status = error.response.status;
         const message = error.response.data;
-        if (status == 404) {
-          setError(message);
-        } else if (status == 401) {
-          setError(message);
-        }
+        setError(`❌ ${message}`);
       } else {
         console.error("Error Updating problem:", error);
       }
     }
   };
+
   const handleDeleteProblem = async (e) => {
     e.preventDefault();
     try {
@@ -139,9 +137,9 @@ const Admin = () => {
           problemNameOfForm: problemNameOfForm,
         },
       });
-      // const data = res.data;
+
       if (res.status === 200) {
-        setSuccess("Problem deleted successfully");
+        setSuccess("🗑️ Problem deleted successfully!");
         setFormData({
           problemName: "",
           description: "",
@@ -152,19 +150,13 @@ const Admin = () => {
         setTags([""]);
         setTestCases([{ input: "", output: "" }]);
       }
-      // console.log("data received from backend", data);
       setError("");
     } catch (error) {
       if (error.response) {
-        const status = error.response.status;
         const message = error.response.data;
-        if (status == 404) {
-          setError(message);
-        } else if (status == 401) {
-          setError(message);
-        }
+        setError(`❌ ${message}`);
       } else {
-        console.error("Error Updating problem:", error);
+        console.error("Error deleting problem:", error);
       }
     }
   };
@@ -182,7 +174,7 @@ const Admin = () => {
           <div className="flex flex-col sm:flex-row gap-4">
             <input
               type="text"
-              placeholder="Enter problem name"
+              placeholder="🔤 Enter problem name..."
               value={problemNameOfForm}
               onChange={(e) => setProblemNameOfForm(e.target.value)}
               className="flex-grow border border-gray-300 rounded-lg px-5 py-3 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
@@ -191,7 +183,7 @@ const Admin = () => {
               onClick={handleFindProblem}
               className="bg-indigo-600 text-white font-semibold px-6 py-3 rounded-lg shadow-md hover:bg-indigo-700 transition"
             >
-              Find Problem
+              🔎 Find Problem
             </button>
           </div>
         </section>
@@ -202,13 +194,13 @@ const Admin = () => {
             {/* Problem Details */}
             <section className="space-y-6">
               <h3 className="text-xl font-bold text-gray-700 border-b pb-2">
-                Problem Details
+                🧾 Problem Details 🛠️
               </h3>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block mb-1 font-semibold text-gray-600">
-                    Problem Name
+                    ✏️ Problem Name
                   </label>
                   <input
                     type="text"
@@ -221,7 +213,7 @@ const Admin = () => {
 
                 <div>
                   <label className="block mb-1 font-semibold text-gray-600">
-                    Author Name
+                    👤 Author Name
                   </label>
                   <input
                     type="text"
@@ -234,7 +226,7 @@ const Admin = () => {
 
                 <div>
                   <label className="block mb-1 font-semibold text-gray-600">
-                    Difficulty
+                    💪 Difficulty
                   </label>
                   <select
                     name="difficulty"
@@ -251,7 +243,7 @@ const Admin = () => {
 
                 <div>
                   <label className="block mb-1 font-semibold text-gray-600">
-                    Constraints
+                    📏 Constraints
                   </label>
                   <input
                     type="text"
@@ -265,7 +257,7 @@ const Admin = () => {
 
               <div>
                 <label className="block mb-1 font-semibold text-gray-600">
-                  Description
+                  📝 Description
                 </label>
                 <textarea
                   name="description"
@@ -280,7 +272,7 @@ const Admin = () => {
             {/* Tags */}
             <section className="space-y-4">
               <h3 className="text-xl font-bold text-gray-700 border-b pb-2">
-                🏷️ Tags
+                🏷️ Tags ✨
               </h3>
               {tags.map((tag, i) => (
                 <div key={i} className="flex gap-3 items-center">
@@ -288,7 +280,7 @@ const Admin = () => {
                     value={tag}
                     onChange={(e) => handleTagChange(i, e.target.value)}
                     className="flex-grow border border-gray-300 rounded-lg px-4 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 transition"
-                    placeholder="Tag"
+                    placeholder="🔖 Tag"
                   />
                   {tags.length > 1 && (
                     <button
@@ -297,7 +289,7 @@ const Admin = () => {
                       className="text-white bg-red-500 hover:bg-red-600 rounded-lg px-3 py-1 transition shadow"
                       aria-label="Remove tag"
                     >
-                      &times;
+                      ❌
                     </button>
                   )}
                 </div>
@@ -307,14 +299,14 @@ const Admin = () => {
                 onClick={addTagBox}
                 className="bg-green-600 text-white font-semibold px-5 py-2 rounded-lg shadow hover:bg-green-700 transition"
               >
-                + Add Tag
+                ➕ Add Tag
               </button>
             </section>
 
             {/* Test Cases */}
             <section className="space-y-4">
               <h3 className="text-xl font-bold text-gray-700 border-b pb-2">
-                🧪 Test Cases
+                🧪 Test Cases 🧬
               </h3>
               {testCases.map((testCase, i) => (
                 <div
@@ -322,7 +314,7 @@ const Admin = () => {
                   className="flex flex-col md:flex-row gap-4 items-center"
                 >
                   <textarea
-                    placeholder="Input"
+                    placeholder="📥 Input"
                     value={testCase.input}
                     onChange={(e) =>
                       handleTestCaseChange(i, "input", e.target.value)
@@ -331,7 +323,7 @@ const Admin = () => {
                     rows={3}
                   />
                   <textarea
-                    placeholder="Output"
+                    placeholder="📤 Output"
                     value={testCase.output}
                     onChange={(e) =>
                       handleTestCaseChange(i, "output", e.target.value)
@@ -344,9 +336,8 @@ const Admin = () => {
                       type="button"
                       onClick={() => removeTestcaseBox(i)}
                       className="text-white bg-red-500 hover:bg-red-600 rounded-lg px-4 py-2 transition shadow"
-                      aria-label="Remove test case"
                     >
-                      Remove
+                      🗑️ Remove
                     </button>
                   )}
                 </div>
@@ -356,7 +347,7 @@ const Admin = () => {
                 onClick={addTestcaseBox}
                 className="bg-green-600 text-white font-semibold px-5 py-2 rounded-lg shadow hover:bg-green-700 transition"
               >
-                + Add Test Case
+                ➕ Add Test Case
               </button>
             </section>
 
@@ -367,14 +358,14 @@ const Admin = () => {
                 onClick={handleUpdateProblem}
                 className="bg-indigo-600 hover:bg-indigo-700 transition text-white font-semibold rounded-lg px-8 py-3 shadow-md"
               >
-                Update Problem
+                💾 Update Problem
               </button>
               <button
                 type="button"
                 onClick={handleDeleteProblem}
                 className="bg-red-600 hover:bg-red-700 transition text-white font-semibold rounded-lg px-8 py-3 shadow-md"
               >
-                Delete Problem
+                🗑️ Delete Problem
               </button>
             </section>
           </form>
@@ -383,39 +374,13 @@ const Admin = () => {
         {/* Messages */}
         {error && (
           <div className="mt-6 text-red-700 bg-red-100 border border-red-300 rounded-lg px-4 py-3 flex items-center gap-2">
-            <svg
-              className="w-5 h-5 text-red-700"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              viewBox="0 0 24 24"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-            >
-              <circle cx="12" cy="12" r="10" />
-              <line x1="12" y1="8" x2="12" y2="12" />
-              <line x1="12" y1="16" x2="12" y2="16" />
-            </svg>
-            <span>{error}</span>
+            ❗ <span>{error}</span>
           </div>
         )}
 
         {success && (
           <div className="mt-6 text-green-700 bg-green-100 border border-green-300 rounded-lg px-4 py-3 flex items-center gap-2">
-            <svg
-              className="w-5 h-5 text-green-700"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              viewBox="0 0 24 24"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-            >
-              <path d="M20 6L9 17l-5-5" />
-            </svg>
-            <span>{success}</span>
+            ✅ <span>{success}</span>
           </div>
         )}
       </div>

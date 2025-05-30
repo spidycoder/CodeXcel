@@ -14,7 +14,7 @@ const Problems = () => {
 
   const sparseUser = JSON.parse(localStorage.getItem("user"));
   const userName = sparseUser ? sparseUser.userName : null;
-  // console.log("userName from localStorage", userName);
+
   useEffect(() => {
     if (!userName) return;
     axios
@@ -26,7 +26,7 @@ const Problems = () => {
         console.error("Error fetching solved problems:", error);
       });
   }, [userName]);
-  // console.log("solvedProblems from FrontendEnd", solvedProblems);
+
   useEffect(() => {
     axios
       .get("http://localhost:8000/problems")
@@ -70,14 +70,14 @@ const Problems = () => {
     <div className="min-h-screen p-6 bg-gray-50">
       <div className="max-w-7xl mx-auto">
         <h1 className="text-4xl font-bold mb-8 text-center text-blue-700">
-          Solve Problems
+          🧠 Solve Coding Problems 🚀
         </h1>
 
         {/* Filters */}
         <div className="grid md:grid-cols-3 gap-3 mb-6 items-center">
           <input
             type="text"
-            placeholder="Search problems..."
+            placeholder="🔍 Search problems..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full border border-gray-300 rounded px-3 py-1.5 text-sm shadow-sm focus:ring-1 focus:ring-blue-400 focus:outline-none"
@@ -88,10 +88,10 @@ const Problems = () => {
             onChange={(e) => setDifficultyFilter(e.target.value)}
             className="w-full border border-gray-300 rounded px-3 py-1.5 text-sm shadow-sm focus:ring-1 focus:ring-blue-400 focus:outline-none"
           >
-            <option value="All">All Difficulties</option>
-            <option value="Easy">Easy</option>
-            <option value="Medium">Medium</option>
-            <option value="Hard">Hard</option>
+            <option value="All">🎯 All Difficulties</option>
+            <option value="Easy">🟢 Easy</option>
+            <option value="Medium">🟡 Medium</option>
+            <option value="Hard">🔴 Hard</option>
           </select>
 
           <div className="flex flex-wrap gap-1">
@@ -105,7 +105,7 @@ const Problems = () => {
                     : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
                 }`}
               >
-                {tag}
+                🏷️ {tag}
               </button>
             ))}
           </div>
@@ -113,7 +113,9 @@ const Problems = () => {
 
         {/* Problem List */}
         {filteredProblems.length === 0 ? (
-          <div className="text-center text-gray-500">No problems found.</div>
+          <div className="text-center text-gray-500 text-lg">
+            😕 No problems found. Try adjusting your filters!
+          </div>
         ) : (
           <ul className="space-y-6">
             {filteredProblems.map((problem, index) => {
@@ -129,14 +131,14 @@ const Problems = () => {
                     {isSolved ? (
                       <FaCheckCircle
                         className="text-green-600"
-                        title="Solved"
-                        aria-label="Solved"
+                        title="✅ Solved"
+                        aria-label="✅ Solved"
                       />
                     ) : (
                       <FaRegCircle
                         className="text-gray-400"
-                        title="Unsolved"
-                        aria-label="Unsolved"
+                        title="⭕ Unsolved"
+                        aria-label="⭕ Unsolved"
                       />
                     )}
 
@@ -147,7 +149,7 @@ const Problems = () => {
                       {index + 1}. {problem.problemName}
                     </Link>
                   </div>
-
+                    
                   <div className="mt-2 text-gray-600">
                     {problem.description}
                   </div>
@@ -162,7 +164,11 @@ const Problems = () => {
                           : "text-red-600"
                       }`}
                     >
-                      {problem.difficulty}
+                      {problem.difficulty === "Easy"
+                        ? "🟢 Easy"
+                        : problem.difficulty === "Medium"
+                        ? "🟡 Medium"
+                        : "🔴 Hard"}
                     </span>
 
                     <div className="flex flex-wrap gap-2 mt-2 md:mt-0">
@@ -171,7 +177,7 @@ const Problems = () => {
                           key={i}
                           className="bg-gray-200 text-gray-700 px-2 py-1 rounded-full text-xs"
                         >
-                          {tag}
+                          🏷️ {tag}
                         </span>
                       ))}
                     </div>
