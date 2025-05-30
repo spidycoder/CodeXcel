@@ -370,9 +370,10 @@ app.get("/problems/:problemName", async (req, res) => {
   }
 });
 //route to find the user find the userName
-app.get("/users/:userName", async (req, res) => {
+app.get("/profile/:userName", async (req, res) => {
   try {
     const { userName } = req.params;
+    // console.log("UserName received in backend", userName);
     const existingUser = await User.findOne({ userName });
     if (!existingUser) {
       res.status(404).send("User not found");
@@ -534,6 +535,15 @@ app.post("/submit", async (req, res) => {
       code,
       verdict: allPassed ? "Accepted" : "Wrong Answer",
     };
+    if (allPassed) {
+      if (existingProblem.difficulty == "Easy") {
+        existingUser.score += 5;
+      } else if (existingProblem.difficulty === "Medium") {
+        existingUser.score += 10;
+      } else {
+        existingUser.score += 15;
+      }
+    }
     existingUser.problemsSolved.push(problem);
     await existingUser.save();
 
@@ -586,6 +596,50 @@ app.post("/ai-review", async (req, res) => {
       .json({ error: "Error in AI review, error: " + error.message });
   }
 });
+app.get("/leaderboard", async (req, res) => {
+  try {
+    const userDetails = await User.find();
+
+    const performance = userDetails
+      .map((user) => ({
+        score: user.score,
+        userName: user.userName,
+      }))
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 5)
+      .map((user, index) => {
+        const rankEmoji = ["🥇", "🥈", "🥉"][index] || `🏅${index + 1}`;
+        return {
+          rank: rankEmoji,
+          userName: user.userName,
+          score: `🎯 ${user.score}`,
+          solved: `✅ ${user.solved}`,
+        };
+      });
+
+    const contributions = userDetails
+      .map((user) => ({
+        contributions: user.problemsContributed,
+        userName: user.userName,
+      }))
+      .sort((a, b) => b.contributions - a.contributions)
+      .slice(0, 5)
+      .map((user, index) => {
+        const rankEmoji = ["🥇", "🥈", "🥉"][index] || `🏅${index + 1}`;
+        return {
+          rank: rankEmoji,
+          userName: user.userName,
+          contributions: `🧠 ${user.contributions}`,
+        };
+      });
+
+    return res.status(200).send({ performance, contributions });
+  } catch (error) {
+    console.error("Error while fetching the leaderboard:", error);
+    return res.status(500).send("Internal Server Error");
+  }
+});
+
 app.listen(PORT || 8000, () => {
   console.log("Server is running on port 8000");
 });

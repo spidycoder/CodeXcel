@@ -26,7 +26,23 @@ const problemSchema = new mongoose.Schema(
   { timestamps: true },
   { _id: false }
 );
-
+const contestSchema = new mongoose.Schema(
+  {
+    constestName: {
+      type: String,
+      required: false,
+    },
+    solved: {
+      type: Number,
+      required: false,
+    },
+    score: {
+      type: Number,
+      required: false,
+    },
+  },
+  { _id: false }
+);
 const userSchema = new mongoose.Schema({
   firstName: {
     type: String,
@@ -63,6 +79,11 @@ const userSchema = new mongoose.Schema({
     type: [problemSchema],
     required: false,
     default: [],
+  },
+  score: {
+    type: Number,
+    required: false,
+    default: 0,
   },
 });
 
