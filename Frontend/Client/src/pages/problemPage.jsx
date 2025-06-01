@@ -237,9 +237,7 @@ const ProblemPage = () => {
             </div>
           </div>
 
-          {/* Editor & Controls */}
           <div className="bg-white p-4 rounded-lg shadow flex flex-col gap-4">
-            {/* Language and Theme */}
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-3">
                 <label className="font-medium">Language:</label>
@@ -251,7 +249,6 @@ const ProblemPage = () => {
                   <option value="cpp">C++</option>
                   <option value="java">Java</option>
                   <option value="py">Python</option>
-                  <option value="js">JavaScript</option>
                 </select>
               </div>
               <button

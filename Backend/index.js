@@ -535,7 +535,11 @@ app.post("/submit", async (req, res) => {
       code,
       verdict: allPassed ? "Accepted" : "Wrong Answer",
     };
-    if (allPassed) {
+    const alreadySolved = existingUser.problemsSolved.find(
+      (p) => p.problemName === existingProblem.problemName
+    );
+    // console.log("Already Solved or not ", alreadySolved);
+    if (allPassed && !alreadySolved) {
       if (existingProblem.difficulty == "Easy") {
         existingUser.score += 5;
       } else if (existingProblem.difficulty === "Medium") {

@@ -2,3 +2,4 @@ codes
 node_modules
 inputs
 outputs
+.env

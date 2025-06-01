@@ -138,12 +138,25 @@ const UserDetails = () => {
         </div>
       </div>
 
-      {/* Bar Chart */}
       <div className="bg-white rounded-xl shadow p-6">
         <Bar data={barChartData} options={barChartOptions} />
       </div>
 
-      {/* Problems Solved */}
+      <div className="flex justify-center">
+        <div className="bg-gradient-to-br from-blue-400 to-indigo-600 text-white rounded-2xl shadow-lg p-6 w-72 flex flex-col items-center gap-4">
+          <div className="text-2xl font-semibold tracking-wide">
+            ⭐ Your Score
+          </div>
+          <div className="w-24 h-24 bg-white text-indigo-600 rounded-full flex items-center justify-center text-3xl font-extrabold shadow-inner border-4 border-white">
+            {userDetails.score}
+          </div>
+          <p className="text-sm text-white/90 text-center">
+            Keep solving problems to increase your score and improve your
+            ranking!
+          </p>
+        </div>
+      </div>
+
       <section>
         <h3 className="text-3xl font-semibold text-gray-900 mb-4 border-b border-gray-300 pb-2">
           🧩 Problems Solved
