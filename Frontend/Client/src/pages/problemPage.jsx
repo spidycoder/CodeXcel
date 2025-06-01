@@ -49,7 +49,7 @@ const ProblemPage = () => {
     e.preventDefault();
     setIsRunning(true);
     try {
-      const res = await axios.post("http://localhost:8000/run", {
+      const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/run`, {
         input,
         problemName,
         language,
@@ -77,12 +77,15 @@ const ProblemPage = () => {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      const res = await axios.post("http://localhost:8000/submit", {
-        language,
-        code,
-        problemName,
-        userName,
-      });
+      const res = await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/submit`,
+        {
+          language,
+          code,
+          problemName,
+          userName,
+        }
+      );
 
       const allPassed = res.data.results.every(
         (result) => result.verdict === "Accepted"
@@ -122,9 +125,12 @@ const ProblemPage = () => {
     setAIReviewLoading(true);
     setShowAIReviewModal(true);
     try {
-      const res = await axios.post("http://localhost:8000/ai-review", {
-        code,
-      });
+      const res = await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/ai-review`,
+        {
+          code,
+        }
+      );
       setAiReview(res.data.review);
       setError("");
     } catch (error) {
@@ -145,7 +151,7 @@ const ProblemPage = () => {
   // console.log("Ai Review received from frontend", aiReview);
   useEffect(() => {
     axios
-      .get(`http://localhost:8000/problems/${problemName}`)
+      .get(`${import.meta.env.VITE_BACKEND_URL}/problems/${problemName}`)
       .then((res) => setProblem(res.data))
       .catch((error) => console.error("Error fetching problem:", error));
   }, [problemName]);
@@ -153,7 +159,7 @@ const ProblemPage = () => {
   useEffect(() => {
     if (showSubmissions && userName) {
       axios
-        .post("http://localhost:8000/submissions", {
+        .post(`${import.meta.env.VITE_BACKEND_URL}/submissions`, {
           userName,
           problemName,
         })

@@ -8,7 +8,7 @@ const LeaderBoard = () => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:8000/leaderboard")
+      .get(`${import.meta.env.VITE_BACKEND_URL}/leaderboard`)
       .then((res) => {
         const data = res.data;
         setPerformerDetails(data.performance);

@@ -60,7 +60,7 @@ const Admin = () => {
         return;
       }
 
-      const res = await axios.get("http://localhost:8000/admin", {
+      const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/admin`, {
         params: {
           problemName: problemNameOfForm,
           userInfo: user,
@@ -99,7 +99,7 @@ const Admin = () => {
         testCases,
       };
 
-      const res = await axios.put("http://localhost:8000/admin", {
+      const res = await axios.put(`${import.meta.env.VITE_BACKEND_URL}/admin`, {
         problemInfo: payload,
         userInfo: user,
         problemNameOfForm: problemNameOfForm,
@@ -131,7 +131,7 @@ const Admin = () => {
   const handleDeleteProblem = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.delete("http://localhost:8000/delete", {
+      const res = await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/delete`, {
         data: {
           userInfo: user,
           problemNameOfForm: problemNameOfForm,

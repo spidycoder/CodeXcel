@@ -18,7 +18,7 @@ const Problems = () => {
   useEffect(() => {
     if (!userName) return;
     axios
-      .post("http://localhost:8000/user", { userName })
+      .post(`${import.meta.env.VITE_BACKEND_URL}/user`, { userName })
       .then((res) => {
         setSolvedProblems(res.data);
       })
@@ -29,7 +29,7 @@ const Problems = () => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:8000/problems")
+      .get(`${import.meta.env.VITE_BACKEND_URL}/problems`)
       .then((res) => {
         setProblems(res.data);
         setFilteredProblems(res.data);

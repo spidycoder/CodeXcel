@@ -32,7 +32,7 @@ const UserDetails = () => {
     if (!user || !user.userName) return;
 
     axios
-      .get(`http://localhost:8000/profile/${userName}`)
+      .get(`${import.meta.env.VITE_BACKEND_URL}/profile/${userName}`)
       .then((res) => {
         setUserDetails(res.data);
 

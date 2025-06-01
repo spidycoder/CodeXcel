@@ -72,7 +72,10 @@ const Contribute = () => {
       return;
     }
     try {
-      const res = await axios.post("http://localhost:8000/contribute", payload);
+      const res = await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/contribute`,
+        payload
+      );
       if (res.status === 200) {
         localStorage.setItem("token", res.data.token);
         window.location.href = "/problems";
@@ -174,9 +177,9 @@ const Contribute = () => {
             <option disabled value="">
               -- Select Difficulty --
             </option>
-            <option>Easy 😎</option>
-            <option>Medium 🤔</option>
-            <option>Hard 😤</option>
+            <option value="Easy">Easy 😎</option>
+            <option value="Medium">Medium 🤔</option>
+            <option value="Hard">Hard 😤</option>
           </select>
         </div>
 
