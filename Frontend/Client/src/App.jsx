@@ -12,20 +12,12 @@ import UserDetails from "./pages/UserDetails";
 import LeaderBoard from "./pages/LeaderBoard";
 
 function App() {
-  // const user = JSON.parse(localStorage.getItem("user"));
   return (
     <BrowserRouter>
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route
-          path="/problems"
-          element={
-            <PrivateRoute>
-              <Problems />
-            </PrivateRoute>
-          }
-        />
+        <Route path="/problems" element={<Problems />} />
         <Route
           path="/problems/:problemName"
           element={
@@ -42,14 +34,7 @@ function App() {
             </PrivateRoute>
           }
         />
-        <Route
-          path="/leaderboard"
-          element={
-            <PrivateRoute>
-              <LeaderBoard />
-            </PrivateRoute>
-          }
-        />
+        <Route path="/leaderboard" element={<LeaderBoard />} />
         <Route
           path="/admin"
           element={

@@ -1,5 +1,6 @@
 const express = require("express");
 const Problem = require("../models/Problem");
+const User = require("../models/User");
 const router = express.Router();
 
 router.delete("/delete", async (req, res) => {

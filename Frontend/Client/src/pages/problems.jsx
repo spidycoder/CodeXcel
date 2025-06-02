@@ -11,7 +11,6 @@ const Problems = () => {
   const [selectedTags, setSelectedTags] = useState([]);
   const [allTags, setAllTags] = useState([]);
   const [solvedProblems, setSolvedProblems] = useState([]);
-
   const sparseUser = JSON.parse(localStorage.getItem("user"));
   const userName = sparseUser ? sparseUser.userName : null;
 
@@ -67,12 +66,16 @@ const Problems = () => {
   };
 
   return (
-    <div className="min-h-screen p-6 bg-gray-50">
+    <div
+      className="min-h-screen p-6"
+      style={{
+        background: "linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%)",
+      }}
+    >
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-4xl font-bold mb-8 text-center text-blue-700">
+        <h1 className="text-4xl font-bold mb-8 text-center text-gray-800">
           🧠 Solve Coding Problems 🚀
         </h1>
-
         {/* Filters */}
         <div className="grid md:grid-cols-3 gap-3 mb-6 items-center">
           <input
@@ -149,10 +152,8 @@ const Problems = () => {
                       {index + 1}. {problem.problemName}
                     </Link>
                   </div>
-                    
-                  <div className="mt-2 text-gray-600">
-                    {problem.description}
-                  </div>
+
+                  <div className="mt-2 text-gray-600">{problem.description}</div>
 
                   <div className="mt-3 flex flex-wrap justify-between items-center">
                     <span

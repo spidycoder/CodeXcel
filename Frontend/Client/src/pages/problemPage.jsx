@@ -49,7 +49,7 @@ const ProblemPage = () => {
     e.preventDefault();
     setIsRunning(true);
     try {
-      const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/run`, {
+      const res = await axios.post("http://localhost:8000/run", {
         input,
         problemName,
         language,
@@ -78,7 +78,7 @@ const ProblemPage = () => {
     setIsSubmitting(true);
     try {
       const res = await axios.post(
-        `${import.meta.env.VITE_BACKEND_URL}/submit`,
+        "http://localhost:8000/submit",
         {
           language,
           code,
@@ -126,7 +126,7 @@ const ProblemPage = () => {
     setShowAIReviewModal(true);
     try {
       const res = await axios.post(
-        `${import.meta.env.VITE_BACKEND_URL}/ai-review`,
+        "http://localhost:8000/ai-review",
         {
           code,
         }

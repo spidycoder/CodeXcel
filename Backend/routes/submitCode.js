@@ -3,8 +3,10 @@ const { executeCPP } = require("../executeCPP");
 const { executePython } = require("../executePython");
 const { executeJava } = require("../executeJava");
 const { executeJS } = require("../executeJS");
-const User = require('../models/User');
-const Problem = require('../models/Problem');
+const { generateFile } = require("../generateFile");
+const { generateInputFile } = require("../generateInputFile");
+const User = require("../models/User");
+const Problem = require("../models/Problem");
 const router = express.Router();
 
 router.post("/submit", async (req, res) => {
@@ -116,10 +118,13 @@ router.post("/submit", async (req, res) => {
       verdict: allPassed ? "Accepted" : "Wrong Answer",
     };
     const alreadySolved = existingUser.problemsSolved.find(
-      (p) => p.problemName === existingProblem.problemName
+      (p) => p.problemName === existingProblem.problemName && p.verdict==="Accepted"
     );
+    // console.log("Already Solved", alreadySolved);
     // console.log("Already Solved or not ", alreadySolved);
-    if (allPassed && !alreadySolved) {
+    if (allPassed && alreadySolved===undefined) {
+      // console.log("First Time Solving");
+      // console.log("prev Score", existingUser.score);
       if (existingProblem.difficulty == "Easy") {
         existingUser.score += 5;
       } else if (existingProblem.difficulty === "Medium") {
@@ -127,7 +132,9 @@ router.post("/submit", async (req, res) => {
       } else {
         existingUser.score += 15;
       }
+      // console.log("Current Score", existingUser.score);
     }
+    // console.log("Score of User", existingUser.score);
     existingUser.problemsSolved.push(problem);
     await existingUser.save();
 

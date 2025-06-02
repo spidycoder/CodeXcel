@@ -95,24 +95,24 @@ const Contribute = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-10 px-4">
-      <div className="max-w-4xl mx-auto mb-10 text-center">
-        <h1 className="text-5xl font-extrabold text-gray-800 mb-2">
+    <div className="min-h-screen bg-gradient-to-tr from-indigo-50 via-white to-indigo-50 py-12 px-6">
+      <div className="max-w-4xl mx-auto mb-12 text-center">
+        <h1 className="text-5xl font-extrabold text-black-900 mb-3">
           Contribute a Coding Problem
         </h1>
-        <p className="text-gray-600 text-lg">
+        <p className="text-black-700 text-lg font-medium">
           🚀 Share your own coding challenge and help the community grow!
         </p>
       </div>
 
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-3xl mx-auto bg-white shadow-lg rounded-lg p-8 sm:p-12 relative"
+        className="w-full max-w-3xl mx-auto bg-white bg-opacity-90 shadow-xl rounded-2xl p-10 sm:p-14 border border-indigo-200"
       >
         <div className="mb-6">
           <label
             htmlFor="problemName"
-            className="block text-gray-700 font-semibold mb-2"
+            className="block text-indigo-900 font-semibold mb-2"
           >
             Problem Name 🏷️
           </label>
@@ -122,14 +122,14 @@ const Contribute = () => {
             name="problemName"
             onChange={handleChange}
             placeholder="Unique problem name"
-            className="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full border border-indigo-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
         </div>
 
         <div className="mb-6">
           <label
             htmlFor="description"
-            className="block text-gray-700 font-semibold mb-2"
+            className="block text-indigo-900 font-semibold mb-2"
           >
             Description 📝
           </label>
@@ -139,14 +139,14 @@ const Contribute = () => {
             onChange={handleChange}
             rows={5}
             placeholder="Enter a short description"
-            className="w-full border border-gray-300 rounded-md px-4 py-3 resize-y focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full border border-indigo-300 rounded-lg px-4 py-3 resize-y focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
         </div>
 
         <div className="mb-6">
           <label
             htmlFor="authorName"
-            className="block text-gray-700 font-semibold mb-2"
+            className="block text-indigo-900 font-semibold mb-2"
           >
             Author Name 🙋‍♂️
           </label>
@@ -156,14 +156,14 @@ const Contribute = () => {
             name="authorName"
             onChange={handleChange}
             placeholder="It should be your username"
-            className="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full border border-indigo-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
         </div>
 
         <div className="mb-6">
           <label
             htmlFor="difficulty"
-            className="block text-gray-700 font-semibold mb-2"
+            className="block text-indigo-900 font-semibold mb-2"
           >
             Difficulty 🎯
           </label>
@@ -171,7 +171,7 @@ const Contribute = () => {
             id="difficulty"
             name="difficulty"
             onChange={handleChange}
-            className="w-full border border-gray-300 rounded-md px-4 py-3 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full border border-indigo-300 rounded-lg px-4 py-3 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
             defaultValue=""
           >
             <option disabled value="">
@@ -184,7 +184,7 @@ const Contribute = () => {
         </div>
 
         <div className="mb-6">
-          <label className="block text-gray-700 font-semibold mb-3">
+          <label className="block text-indigo-900 font-semibold mb-3">
             Tags 🏷️
           </label>
           {tags.map((tag, index) => (
@@ -194,13 +194,13 @@ const Contribute = () => {
                 value={tag}
                 onChange={(e) => handleTagChange(index, e.target.value)}
                 placeholder={`Tag ${index + 1}`}
-                className="flex-grow border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="flex-grow border border-indigo-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
               {tags.length > 1 && (
                 <button
                   type="button"
                   onClick={() => removeTagBox(index)}
-                  className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md"
+                  className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg"
                   title="Remove Tag"
                 >
                   ❌
@@ -211,7 +211,7 @@ const Contribute = () => {
           <button
             type="button"
             onClick={addTagBox}
-            className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-md"
+            className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg"
             title="Add Tag"
           >
             ➕ Add Tag
@@ -221,7 +221,7 @@ const Contribute = () => {
         <div className="mb-6">
           <label
             htmlFor="constraints"
-            className="block text-gray-700 font-semibold mb-2"
+            className="block text-indigo-900 font-semibold mb-2"
           >
             Constraints ⚙️
           </label>
@@ -231,12 +231,12 @@ const Contribute = () => {
             name="constraints"
             onChange={handleChange}
             placeholder="e.g., 1 ≤ N ≤ 10⁵"
-            className="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full border border-indigo-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
         </div>
 
         <div className="mb-8">
-          <label className="block text-gray-700 font-semibold mb-4">
+          <label className="block text-indigo-900 font-semibold mb-4">
             Test Cases 🧪
           </label>
           {testCases.map((tc, index) => (
@@ -248,7 +248,7 @@ const Contribute = () => {
                 }
                 placeholder={`Input ${index + 1}`}
                 rows={3}
-                className="w-full sm:w-1/2 border border-gray-300 rounded-md px-4 py-3 resize-y focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full sm:w-1/2 border border-indigo-300 rounded-lg px-4 py-3 resize-y focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
               <textarea
                 value={tc.output}
@@ -257,13 +257,13 @@ const Contribute = () => {
                 }
                 placeholder={`Output ${index + 1}`}
                 rows={3}
-                className="w-full sm:w-1/2 border border-gray-300 rounded-md px-4 py-3 resize-y focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full sm:w-1/2 border border-indigo-300 rounded-lg px-4 py-3 resize-y focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
               {testCases.length > 1 && (
                 <button
                   type="button"
                   onClick={() => removeTestcaseBox(index)}
-                  className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md self-start"
+                  className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg self-start"
                   title="Remove Test Case"
                 >
                   ❌
@@ -274,7 +274,7 @@ const Contribute = () => {
           <button
             type="button"
             onClick={addTestcaseBox}
-            className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-md"
+            className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg"
             title="Add Test Case"
           >
             ➕ Add Test Case
@@ -284,7 +284,7 @@ const Contribute = () => {
         <div className="text-center">
           <button
             type="submit"
-            className="bg-indigo-600 hover:bg-indigo-700 text-white text-lg font-semibold px-8 py-3 rounded-md"
+            className="bg-indigo-700 hover:bg-indigo-800 text-white text-lg font-semibold px-8 py-3 rounded-lg shadow-lg transition"
           >
             🚀 Submit Problem
           </button>
@@ -294,9 +294,7 @@ const Contribute = () => {
           <p className="mt-6 text-center text-red-600 font-semibold">{error}</p>
         )}
 
-        <div className="absolute bottom-4 right-4 text-3xl select-none pointer-events-none">
-          🎉
-        </div>
+        
       </form>
     </div>
   );
