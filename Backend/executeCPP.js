@@ -7,7 +7,7 @@ if (!fs.existsSync(outputPath)) {
   fs.mkdirSync(outputPath, { recursive: true });
 }
 
-const TIME_LIMIT = 5000; // 2 seconds time limit
+const TIME_LIMIT = 10000; // 2 seconds time limit
 
 const executeCPP = (filePath, input = "") => {
   const jobId = path.basename(filePath).split(".")[0];

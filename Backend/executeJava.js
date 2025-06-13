@@ -7,7 +7,7 @@ if (!fs.existsSync(outputPath)) {
   fs.mkdirSync(outputPath, { recursive: true });
 }
 
-const TIME_LIMIT = 5000; // 2 seconds
+const TIME_LIMIT = 10000; // 2 seconds
 
 const executeJava = (filePath, inputFile) => {
   return new Promise((resolve) => {
