@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import codeXcel from "../assets/codeXcel.png"
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -51,9 +52,9 @@ const Navbar = () => {
             className="flex items-center gap-2 text-white font-extrabold text-2xl select-none"
           >
             <img
-              src="https://cdn-icons-png.flaticon.com/512/4997/4997543.png"
+              src={codeXcel}
               alt="CodeXcel Logo"
-              className="h-10 w-10 rounded-full shadow-md"
+              className="h-15 w-15 rounded-full shadow-md"
             />
             CodeXcel
           </Link>

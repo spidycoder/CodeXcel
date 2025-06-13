@@ -53,7 +53,7 @@ app.use("/", profileOfUserRoute);
 //api for running the code.
 app.use("/", runCodeRoute);
 //api for submitting the code.
-app.use("/", submitCodeRoute);
+app.use("/", submitCodeRoute);  
 //route to find the user's submissions for a problem
 app.use("/", submissionsRoute);
 //route for AI reveiw

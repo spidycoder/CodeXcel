@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import codeXcel from "../assets/codeXcel.png";
 
 const Login = () => {
   const [error, setError] = useState("");
@@ -26,7 +27,10 @@ const Login = () => {
     }
 
     try {
-      const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/login`, formData);
+      const res = await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/login`,
+        formData
+      );
       if (res.status === 200) {
         const userData = {
           token: res.data.token,
@@ -49,8 +53,17 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-tr from-blue-50 to-blue-100 dark:from-gray-800 dark:to-gray-900 px-4">
-      <div className="w-full max-w-md bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-8 sm:p-10">
+    <div
+      className="min-h-screen flex items-center justify-center bg-cover bg-center px-4"
+      style={{
+        backgroundImage: `url(${codeXcel})`,
+        backgroundRepeat: "no-repeat",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backdropFilter: "blur(2px)",
+      }}
+    >
+      <div className="w-full max-w-md bg-white/90 dark:bg-gray-800/90 rounded-xl shadow-2xl p-8 sm:p-10">
         <h2 className="text-3xl font-extrabold text-center text-gray-800 dark:text-white mb-6">
           Welcome Back 👋
         </h2>
@@ -117,22 +130,6 @@ const Login = () => {
               Register Now
             </Link>
           </p>
-
-          {/* Google Login (Optional) */}
-          {/* 
-          <button
-            type="button"
-            className="w-full flex items-center justify-center gap-3 mt-2 border rounded-md py-2 bg-white dark:bg-gray-700 text-black dark:text-white hover:bg-gray-100 dark:hover:bg-gray-600 transition"
-          >
-            <img
-              src="https://cdn-icons-png.flaticon.com/512/2991/2991148.png"
-              height={20}
-              width={20}
-              alt="Google"
-            />
-            <span>Log In with Google</span>
-          </button>
-          */}
         </form>
       </div>
     </div>

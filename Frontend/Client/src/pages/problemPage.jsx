@@ -49,7 +49,7 @@ const ProblemPage = () => {
     e.preventDefault();
     setIsRunning(true);
     try {
-      const res = await axios.post("http://localhost:8000/run", {
+      const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/run`, {
         input,
         problemName,
         language,
@@ -78,7 +78,7 @@ const ProblemPage = () => {
     setIsSubmitting(true);
     try {
       const res = await axios.post(
-        "http://localhost:8000/submit",
+        `${import.meta.env.VITE_BACKEND_URL}/submit`,
         {
           language,
           code,
@@ -126,7 +126,7 @@ const ProblemPage = () => {
     setShowAIReviewModal(true);
     try {
       const res = await axios.post(
-        "http://localhost:8000/ai-review",
+        `${import.meta.env.VITE_BACKEND_URL}/ai-review`,
         {
           code,
         }
@@ -405,43 +405,52 @@ const ProblemPage = () => {
           </div>
         </div>
       ) : (
-        <div className="bg-white p-6 rounded shadow">
-          <h2 className="text-xl font-bold mb-4">
+        <div className="bg-white p-6 rounded-xl shadow-lg">
+          <h2 className="text-2xl font-semibold mb-6 text-gray-800">
             My Submissions for "{problemName}"
           </h2>
-          {submissions.length === 0 ? (
+
+          {submissions && submissions.length === 0 ? (
             <p className="text-gray-500">No submissions yet.</p>
           ) : (
-            <ul className="space-y-4">
-              {submissions.submissions.length === 0 ? (
-                <p className="text-gray-500">No submissions yet.</p>
-              ) : (
-                <ul className="space-y-4">
-                  {submissions.submissions.map((s, index) => (
-                    <li key={index} className="border rounded p-4">
-                      <p className="text-sm text-gray-600">
-                        <strong>Language:</strong> {s.language.toUpperCase()} |{" "}
-                        <strong>Verdict:</strong>{" "}
-                        <span
-                          className={
-                            s.verdict === "Accepted"
-                              ? "text-green-600"
-                              : "text-red-600"
-                          }
-                        >
-                          {s.verdict}
-                        </span>
-                      </p>
-                      <pre className="bg-gray-100 mt-2 p-2 rounded text-sm overflow-auto">
-                        {s.code}
-                      </pre>
-                      <p className="text-xs text-gray-500 mt-1">
-                        Submitted: {new Date(s.createdAt).toLocaleString()}
-                      </p>
-                    </li>
-                  ))}
-                </ul>
-              )}
+            <ul className="space-y-6">
+              {submissions.submissions.map((s, index) => (
+                <li
+                  key={index}
+                  className="border border-gray-200 rounded-lg p-4 relative bg-gray-50 hover:shadow-md transition-shadow"
+                >
+                  <div className="flex justify-between items-center mb-2">
+                    <div className="text-sm text-gray-700 space-x-3">
+                      <span className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-xs font-medium">
+                        {s.language?.toUpperCase()}
+                      </span>
+                      <span
+                        className={`px-2 py-0.5 rounded text-xs font-medium ${
+                          s.verdict === "Accepted"
+                            ? "bg-green-100 text-green-700"
+                            : "bg-red-100 text-red-700"
+                        }`}
+                      >
+                        {s.verdict}
+                      </span>
+                    </div>
+                    <button
+                      onClick={() => navigator.clipboard.writeText(s.code)}
+                      className="text-xs text-gray-600 hover:text-gray-900 bg-white border border-gray-300 px-2 py-1 rounded shadow-sm transition active:scale-95"
+                      title="Copy Code"
+                    >
+                      Copy
+                    </button>
+                  </div>
+
+                  <pre className="bg-gray-100 mt-2 p-3 rounded text-sm overflow-auto max-h-64">
+                    {s.code}
+                  </pre>
+                  <p className="text-xs text-gray-500 mt-2">
+                    Submitted: {new Date(s.createdAt).toLocaleString()}
+                  </p>
+                </li>
+              ))}
             </ul>
           )}
         </div>

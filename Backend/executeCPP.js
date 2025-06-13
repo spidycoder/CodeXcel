@@ -7,6 +7,8 @@ if (!fs.existsSync(outputPath)) {
   fs.mkdirSync(outputPath, { recursive: true });
 }
 
+const TIME_LIMIT = 2000; // 2 seconds time limit
+
 const executeCPP = (filePath, input = "") => {
   const jobId = path.basename(filePath).split(".")[0];
   const output_fileName = `${jobId}.exe`;
@@ -14,9 +16,7 @@ const executeCPP = (filePath, input = "") => {
 
   return new Promise((resolve, reject) => {
     const compile = spawn("g++", [filePath, "-o", outPath]);
-
     let compileError = "";
-
     compile.stderr.on("data", (data) => {
       compileError += data.toString();
     });
@@ -33,7 +33,13 @@ const executeCPP = (filePath, input = "") => {
 
       let output = "";
       let runtimeError = "";
+      let timedOut = false;
 
+      // Set timeout
+      const timeout = setTimeout(() => {
+        timedOut = true;
+        run.kill("SIGKILL"); // Forcefully kill the process
+      }, TIME_LIMIT);
       run.stdin.write(input, "utf-8", () => {
         run.stdin.end();
       });
@@ -47,6 +53,14 @@ const executeCPP = (filePath, input = "") => {
       });
 
       run.on("close", (code) => {
+        clearTimeout(timeout);
+
+        if (timedOut) {
+          return resolve({
+            success: false,
+            error: `Time Limit Exceeded.Please Optimise Your Code or check for any Infinite loop`,
+          });
+        }
         if (code !== 0 || runtimeError) {
           return resolve({
             success: false,

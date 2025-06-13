@@ -37,7 +37,7 @@ router.post("/submit", async (req, res) => {
     // console.log("TestCases for the problem", testCases);
     const filePath = generateFile(language, code);
     const results = [];
-
+    let codeError = "Wrong Answer";
     for (let i = 0; i < testCases.length; i++) {
       const testInput = testCases[i].input;
       const expectedOutput = testCases[i].output;
@@ -66,8 +66,9 @@ router.post("/submit", async (req, res) => {
           error: result.error,
           expectedOutput,
           receivedOutput: null,
-          verdict: "Compilation/Runtime Error",
+          verdict: result.error,
         });
+        codeError = result.error;
         continue;
       }
 
@@ -93,7 +94,11 @@ router.post("/submit", async (req, res) => {
       // console.log("Received Normalized Output output", receivedOutput);
 
       const passed = receivedOutput === expectedTrimmed;
-
+      if (passed) {
+        codeError = result.error;
+      } else {
+        codeError = "Wrong Answer";
+      }
       results.push({
         input: testInput,
         expectedOutput: expectedTrimmed,
@@ -115,14 +120,16 @@ router.post("/submit", async (req, res) => {
       difficulty: existingProblem.difficulty,
       language,
       code,
-      verdict: allPassed ? "Accepted" : "Wrong Answer",
+      verdict: allPassed ? "Accepted" : codeError,
     };
     const alreadySolved = existingUser.problemsSolved.find(
-      (p) => p.problemName === existingProblem.problemName && p.verdict==="Accepted"
+      (p) =>
+        p.problemName === existingProblem.problemName &&
+        p.verdict === "Accepted"
     );
     // console.log("Already Solved", alreadySolved);
     // console.log("Already Solved or not ", alreadySolved);
-    if (allPassed && alreadySolved===undefined) {
+    if (allPassed && alreadySolved === undefined) {
       // console.log("First Time Solving");
       // console.log("prev Score", existingUser.score);
       if (existingProblem.difficulty == "Easy") {
