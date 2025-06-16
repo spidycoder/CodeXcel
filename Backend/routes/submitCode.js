@@ -139,10 +139,10 @@ router.post("/submit", async (req, res) => {
       } else {
         existingUser.score += 15;
       }
+      existingUser.problemsSolved.push(problem);
       // console.log("Current Score", existingUser.score);
     }
     // console.log("Score of User", existingUser.score);
-    existingUser.problemsSolved.push(problem);
     await existingUser.save();
 
     // console.log("Result of Submission", results);

@@ -27,7 +27,9 @@ router.delete("/delete", async (req, res) => {
 
     // Update user's problemsContributed
     existingUser.problemsContributed = existingUser.problemsContributed - 1;
-
+    if(existingUser.problemsContributed<=0){
+      existingUser.problemsContributed=0;
+    }
     // Remove from problemsSolved if present
     if (
       existingUser.problemsSolved.some(
