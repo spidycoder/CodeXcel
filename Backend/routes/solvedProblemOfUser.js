@@ -11,11 +11,15 @@ router.post("/user", async (req, res) => {
     }
     const solved = [];
     for (let problem of existingUser.problemsSolved) {
+      if (problem.verdict === "Accepted") {
       solved.push(problem.problemName);
     }
+  }
     // console.log("Solved Questions from Backend",solved);
     return res.status(200).json(solved);
-  } catch (error) {}
+  } catch (error) {
+    return res.status(500).send("Internal Server Error");
+  }
 });
 
 module.exports = router;

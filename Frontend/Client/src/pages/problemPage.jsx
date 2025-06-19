@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import axios from "axios";
 import Editor from "@monaco-editor/react";
 import ReactConfetti from "react-confetti";
@@ -7,11 +7,13 @@ import AIReviewCard from "./AiReviewCard";
 
 const ProblemPage = () => {
   const { problemName } = useParams();
+  const [showRecommendations, setShowRecommendations] = useState(false);
+  const [recommendations, setRecommendations] = useState([]);
   const [problem, setProblem] = useState(null);
   const [isRunning, setIsRunning] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [language, setLanguage] = useState("cpp");
-  const [code, setCode] = useState("// Write your code here");
+  const [language, setLanguage] = useState("cpp");  
+  const [code, setCode] = useState("");
   const [input, setInput] = useState("");
   const [output, setOutput] = useState("");
   const [error, setError] = useState("");
@@ -26,6 +28,33 @@ const ProblemPage = () => {
   const storedUser = localStorage.getItem("user");
   const user = storedUser ? JSON.parse(storedUser) : null;
   const userName = user?.userName;
+
+  const boilerplates = {
+    cpp: `#include <iostream>
+using namespace std;
+
+int main() {
+    // your code goes here
+    cout<<"Hello World"<<endl;
+    return 0;
+}
+`,
+    py: `def main():
+    # your code goes here
+    print("Hello World")
+
+if __name__ == "__main__":
+    main()
+`,
+    java: `public class Main {
+    public static void main(String[] args) {
+        // your code goes here
+        System.out.println("Hello World");
+    }
+}
+`,
+ 
+  };
 
   const useWindowSize = () => {
     const [windowSize, setWindowSize] = useState({
@@ -147,8 +176,13 @@ const ProblemPage = () => {
       setAIReviewLoading(false);
     }
   };
-
-  // console.log("Ai Review received from frontend", aiReview);
+  useEffect(() => {
+    if (!problemName) return;
+    axios
+      .get(`${import.meta.env.VITE_BACKEND_URL}/recommendations/by-problem/${problemName}`)
+      .then(res => setRecommendations(res.data))
+      .catch(err => setRecommendations([]));
+  }, [problemName]);
   useEffect(() => {
     axios
       .get(`${import.meta.env.VITE_BACKEND_URL}/problems/${problemName}`)
@@ -167,6 +201,10 @@ const ProblemPage = () => {
         .catch((err) => console.error("Failed to fetch submissions", err));
     }
   }, [showSubmissions, userName, problemName]);
+
+  useEffect(() => {
+    setCode(boilerplates[language] || "");
+  }, [language]);
 
   if (!problem) return <div className="p-6">Loading....</div>;
 
@@ -192,57 +230,67 @@ const ProblemPage = () => {
       </div>
 
       {!showSubmissions ? (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="bg-white p-6 rounded-lg shadow">
-            <h1 className="text-2xl font-bold mb-2">{problemName}</h1>
-            <p className="text-sm text-gray-600 mb-2">
-              Difficulty:{" "}
-              <span
-                className={`font-semibold ${
-                  problem.difficulty === "Easy"
-                    ? "text-green-500"
-                    : problem.difficulty === "Medium"
-                    ? "text-yellow-500"
-                    : "text-red-500"
-                }`}
-              >
-                {problem.difficulty}
-              </span>
-            </p>
-            <p className="text-sm text-gray-600 mb-4">
-              Contributor: {problem.authorName}
-            </p>
-            <p className="mb-4">{problem.description}</p>
-            <p className="font-semibold mb-2">
-              Constraints: {problem.constraints}
-            </p>
-
-            <div className="mb-4">
-              <p className="font-semibold">Tags:</p>
-              <ul className="list-disc list-inside text-sm">
-                {problem.tags.map((tag, i) => (
-                  <li key={i}>{tag}</li>
-                ))}
-              </ul>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 relative">
+          <div className="bg-white p-6 rounded-lg shadow flex flex-col justify-between">
+            <div>
+              <h1 className="text-2xl font-bold mb-2">{problemName}</h1>
+              <p className="text-sm text-gray-600 mb-2">
+                Difficulty: <span className={`font-semibold ${problem.difficulty === "Easy" ? "text-green-500" : problem.difficulty === "Medium" ? "text-yellow-500" : "text-red-500"}`}>{problem.difficulty}</span>
+              </p>
+              <p className="text-sm text-gray-600 mb-4">Contributor: {problem.authorName}</p>
+              <p className="mb-4">{problem.description}</p>
+              <p className="font-semibold mb-2">Constraints: {problem.constraints}</p>
+              <div className="mb-4">
+                <p className="font-semibold">Tags:</p>
+                <ul className="list-disc list-inside text-sm">
+                  {problem.tags.map((tag, i) => (<li key={i}>{tag}</li>))}
+                </ul>
+              </div>
+              <div>
+                <p className="font-semibold mb-2">Sample Test Cases:</p>
+                <ul className="space-y-2">
+                  {problem.testCases.map((tc, i) => (
+                    <li key={i} className="bg-gray-100 p-2 rounded border">
+                      <p><strong>Input:</strong> {tc.input}</p>
+                      <p><strong>Output:</strong> {tc.output}</p>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
 
-            <div>
-              <p className="font-semibold mb-2">Sample Test Cases:</p>
-              <ul className="space-y-2">
-                {problem.testCases.map((tc, i) => (
-                  <li key={i} className="bg-gray-100 p-2 rounded border">
-                    <p>
-                      <strong>Input:</strong> {tc.input}
-                    </p>
-                    <p>
-                      <strong>Output:</strong> {tc.output}
-                    </p>
-                  </li>
-                ))}
-              </ul>
+            <div className="mt-6">
+              <button
+                onClick={() => setShowRecommendations((prev) => !prev)}
+                className="flex items-center gap-2 px-4 py-2 mt-4 bg-gradient-to-r from-indigo-500 to-blue-500 text-white font-semibold rounded shadow hover:from-indigo-600 hover:to-blue-600"
+              >
+                <span>Recommended for you</span>
+                <svg className={`w-4 h-4 transition-transform ${showRecommendations ? "rotate-180" : "rotate-0"}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              {showRecommendations && (
+                <div className="mt-4 bg-gray-50 rounded border p-4 shadow-inner">
+                  <h3 className="font-bold text-indigo-600 mb-3">You might also like:</h3>
+                  <ul className="space-y-2">
+                    {recommendations.length === 0 ? (
+                      <li className="text-sm text-gray-500">No recommendations found.</li>
+                    ) : (
+                      recommendations.map(problem => (
+                        <li key={problem.problemName} className="flex items-center justify-between bg-indigo-100 rounded p-2">
+                          <div>
+                            <span className="font-semibold text-indigo-800">{problem.problemName}</span>
+                            <span className={`ml-2 px-2 py-0.5 text-xs rounded font-medium ${problem.difficulty === "Easy" ? "bg-green-200 text-green-800" : problem.difficulty === "Medium" ? "bg-yellow-200 text-yellow-800" : "bg-red-200 text-red-800"}`}>{problem.difficulty}</span>
+                          </div>
+                          <Link to={`/problems/${problem.problemName}`} className="text-sm bg-indigo-600 text-white px-3 py-1 rounded hover:bg-indigo-700">Solve</Link>
+                        </li>
+                      ))
+                    )}
+                  </ul>
+                </div>
+              )}
             </div>
           </div>
-
           <div className="bg-white p-4 rounded-lg shadow flex flex-col gap-4">
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-3">

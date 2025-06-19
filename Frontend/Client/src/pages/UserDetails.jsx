@@ -38,7 +38,7 @@ const UserDetails = () => {
 
         const uniqueProblemsMap = new Map();
         res.data.problemsSolved.forEach((problem) => {
-          if (!uniqueProblemsMap.has(problem.problemName)) {
+          if (!uniqueProblemsMap.has(problem.problemName) && problem.verdict === "Accepted") {
             uniqueProblemsMap.set(problem.problemName, problem);
           }
         });
@@ -46,7 +46,7 @@ const UserDetails = () => {
         setProblems(Array.from(uniqueProblemsMap.values()));
       })
       .catch((error) => console.error("Error fetching user details:", error));
-  }, [user]);
+  }, [userName]);
 
   const difficultyCount = {
     Easy: problems.filter((p) => p.difficulty === "Easy").length,

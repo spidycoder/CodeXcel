@@ -16,7 +16,7 @@ const submitCodeRoute = require("./routes/submitCode");
 const submissionsRoute = require("./routes/submissionsRoute");
 const aiCodeReviewRoute = require("./routes/aireview");
 const leaderboardRoute = require("./routes/leaderboard");
-
+const recommendationsRoute = require("./routes/recommendationsRoute");
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -60,7 +60,8 @@ app.use("/", submissionsRoute);
 app.use("/", aiCodeReviewRoute);
 //route to get the leaderBoard.
 app.use("/", leaderboardRoute);
-
+//route to get the recommendations.
+app.use("/", recommendationsRoute);
 app.listen(PORT || 8000, () => {
   console.log("Server is running on port 8000");
 });
