@@ -1,10 +1,13 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import { Eye, EyeOff } from "lucide-react"; 
 import codeXcel from "../assets/codeXcel.png";
 
 const Register = () => {
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -176,33 +179,55 @@ const Register = () => {
           </div>
 
           {/* Password */}
-          <div className="flex flex-col">
-            <label htmlFor="password" className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
-              Password
-            </label>
+          <div className="relative">
             <input
-              type="password"
+              type={showPassword ? "text" : "password"}
               id="password"
               name="password"
-              placeholder="Must be at least 5 characters"
               onChange={handleChange}
-              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+              className="peer w-full px-4 pt-5 pb-2 pr-10 border rounded-md bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white placeholder-transparent focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="••••••••"
             />
+            <label
+              htmlFor="password"
+              className="absolute left-4 top-2 text-gray-500 dark:text-gray-300 text-sm transition-all peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 dark:peer-placeholder-shown:text-gray-400 peer-focus:top-2 peer-focus:text-sm peer-focus:text-blue-500"
+            >
+              Password
+            </label>
+
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-300 focus:outline-none"
+            >
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
           </div>
 
           {/* Confirm Password */}
-          <div className="flex flex-col">
-            <label htmlFor="confirmPassword" className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
+          <div className="flex flex-col relative">
+            <label
+              htmlFor="confirmPassword"
+              className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200"
+            >
               Confirm Password
             </label>
             <input
-              type="password"
+              type={showConfirmPassword ? "text" : "password"}
               id="confirmPassword"
               name="confirmPassword"
               placeholder="Same as above"
               onChange={handleChange}
-              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="px-4 py-2 pr-10 border border-gray-300 dark:border-gray-600 rounded-md bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
+            <button
+              type="button"
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              className="absolute right-3 top-[38px] transform -translate-y-1/2 text-gray-500 dark:text-gray-300 focus:outline-none"
+            >
+              {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
           </div>
 
           {/* Error Message */}

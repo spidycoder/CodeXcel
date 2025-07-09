@@ -17,9 +17,9 @@ router.post("/run", async (req, res) => {
     // console.log("language received in backend", language);
     // console.log("code received in backend", code);
 
-    if (!input || input.trim().length === 0) {
-      return res.status(400).send("Fill the input");
-    }
+    // if (!input || input.trim().length === 0) {
+    //   return res.status(400).send("Fill the input");
+    // }
     if (!problemName || problemName.trim() === "") {
       return res.status(401).send("problem name is not defined");
     }

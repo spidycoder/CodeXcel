@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import { Eye, EyeOff } from "lucide-react"; 
 import axios from "axios";
 import codeXcel from "../assets/codeXcel.png";
 
 const Login = () => {
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -87,16 +89,16 @@ const Login = () => {
               Email
             </label>
           </div>
-
+          
           {/* Password */}
           <div className="relative">
             <input
-              type="password"
+              type={showPassword ? "text" : "password"}
               id="password"
               name="password"
               onChange={handleChange}
               required
-              className="peer w-full px-4 pt-5 pb-2 border rounded-md bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white placeholder-transparent focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="peer w-full px-4 pt-5 pb-2 pr-10 border rounded-md bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white placeholder-transparent focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="••••••••"
             />
             <label
@@ -105,6 +107,14 @@ const Login = () => {
             >
               Password
             </label>
+
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-300 focus:outline-none"
+            >
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
           </div>
 
           {/* Submit Button */}
